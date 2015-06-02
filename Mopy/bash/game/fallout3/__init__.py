@@ -26,6 +26,7 @@
    Fallout 3 is set at the active game."""
 import struct
 from .constants import *
+from .default_tweaks import default_tweaks
 from ... import brec
 from .records import MreActi, MreAddn, MreAlch, MreAmmo, MreAnio, MreArma, \
     MreArmo, MreAspc, MreAvif, MreBook, MreBptd, MreCams, MreClas, MreClmt, \
