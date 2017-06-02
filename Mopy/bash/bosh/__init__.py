@@ -2765,12 +2765,14 @@ class SaveInfos(FileInfos):
         # saveInfos singleton is constructed in InitData after bosh.oblivionIni
         self.localSave = oblivionIni.getSetting(
             bush.game.saveProfilesKey[0], bush.game.saveProfilesKey[1],
-            u'Saves\\')
+            u'Saves')
         # Hopefully will solve issues with unicode usernames # TODO(ut) test
         self.localSave = decode(self.localSave) # encoding = 'cp1252' ?
+        if os.name == 'posix':
+            self.localSave = self.localSave.replace('\\', '/')
 
     def __init__(self):
-        self.localSave = u'Saves\\'
+        self.localSave = u'Saves'
         self._setLocalSaveFromIni()
         super(SaveInfos, self).__init__(dirs['saveBase'].join(self.localSave),
                                         SaveInfo)
