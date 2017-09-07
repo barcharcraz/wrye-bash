@@ -339,7 +339,7 @@ class Fallout4SaveHeader(SkyrimSaveHeader): # pretty similar to skyrim
 
 class FalloutNVSaveHeader(SaveFileHeader):
     save_magic = 'FO3SAVEGAME'
-    __slots__ = ('language', 'ssDepth', 'pcNick', '_unknown')
+    __slots__ = ('language', 'ssDepth', 'pcNick', '_unknown', 'gameDate')
     _masters_unknown_byte = 0x1B
     unpackers = OrderedDict([
         ('header_size', (00, unpack_int)),
@@ -352,7 +352,7 @@ class FalloutNVSaveHeader(SaveFileHeader):
         ('pcNick',      (00, unpack_str16_delim)),
         ('pcLevel',     (00, unpack_int_delim)),
         ('pcLocation',  (00, unpack_str16_delim)),
-        ('playTime',    (00, unpack_str16_delim)),
+        ('gameDate',    (00, unpack_str16_delim)),
     ])
 
     def load_masters(self, ins):
@@ -364,8 +364,8 @@ class FalloutNVSaveHeader(SaveFileHeader):
             self.masters.append(unpack_str16_delim(ins))
 
     def _master_list_size(self, ins):
-        unknown, masterListSize = struct.unpack('=BI', ins.read(5))
-        if unknown != self._masters_unknown_byte: raise SaveHeaderError(
+        formVersion, masterListSize = struct.unpack('=BI', ins.read(5))
+        if formVersion != self._masters_unknown_byte: raise SaveHeaderError(
             u'Unknown byte at position %d is %r not 0x%X' % (
                 ins.tell(), unknown, self._masters_unknown_byte))
         return masterListSize
@@ -390,11 +390,18 @@ class FalloutNVSaveHeader(SaveFileHeader):
         #--Offsets
         offset = out.tell() - ins.tell()
         #--File Location Table
-        for i in xrange(6):
+        for i in xrange(5):
             # formIdArrayCount offset and 5 others
             oldOffset = unpack_int(ins)
             pack('I', oldOffset + offset)
         return oldMasters
+
+    def calc_time(self):
+        # gameDate format: hours.minutes.seconds
+        hours, minutes, seconds = [int(x) for x in self.gameDate.split('.')]
+        playSeconds = hours * 60 * 60 + minutes * 60 + seconds
+        self.gameDays = float(playSeconds) / (24 * 60 * 60)
+        self.gameTicks = playSeconds * 1000
 
 class Fallout3SaveHeader(FalloutNVSaveHeader):
     save_magic = 'FO3SAVEGAME'
