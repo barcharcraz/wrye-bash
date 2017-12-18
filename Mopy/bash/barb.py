@@ -48,7 +48,7 @@ from . import images_list
 from bolt import GPath, deprint
 from balt import askSave, askOpen, askWarning, showError, showWarning, \
     showInfo, Link, BusyCursor, askYes
-from exception import AbstractError
+from exception import AbstractError, BoltError
 
 opts = None # command line arguments used when launching Bash, set on bash
 
@@ -93,7 +93,8 @@ def init_settings_files():
 #------------------------------------------------------------------------------
 class BaseBackupSettings(object):
 
-    def __init__(self, parent=None, settings_file=None, do_quit=False):
+    def __init__(self, parent=None, settings_file=None, do_quit=False,
+                 handle_images=None):
         self.quit = do_quit
         self._settings_file = settings_file
         self.parent = parent
@@ -255,13 +256,27 @@ class RestoreSettings(BaseBackupSettings):
         dest_dir = bass.dirs['mopy']
         GPath(bash_ini).copyTo(dest_dir.join(u'bash.ini'))
 
+    def extract_backup(self):
+        """Extract the backup file and return the tmp directory used. If
+        the backup file is a dir we assume it was created by us before
+        restarting."""
+        if self._settings_file.isfile():
+            temp_dir = bolt.Path.tempDir(prefix=u'RestoreSettingsWryeBash_')
+            command = archives.extractCommand(self._settings_file, temp_dir)
+            archives.extract7z(command, self._settings_file)
+            return temp_dir
+        elif self._settings_file.isdir():
+            return self._settings_file
+        raise BoltError(
+            u'%s is not a valid backup location' % self._settings_file)
+
     def Apply(self):
-        temp_settings_restore_dir = bolt.Path.tempDir()
+        temp_settings_restore_dir = self.extract_backup()
         try:
             self._Apply(temp_settings_restore_dir)
         finally:
             if temp_settings_restore_dir:
-                temp_settings_restore_dir.rmtree(safety=u'WryeBash_')
+                temp_settings_restore_dir.rmtree(safety=u'RestoreSettingsWryeBash_')
 
     def incompatible_backup(self, temp_dir):
         # TODO add game check, bash.ini check
@@ -293,8 +308,6 @@ class RestoreSettings(BaseBackupSettings):
         return False
 
     def _Apply(self, temp_dir):
-        command = archives.extractCommand(self._settings_file, temp_dir)
-        archives.extract7z(command, self._settings_file)
         if self.incompatible_backup(temp_dir): return
 
         deprint(u'')
