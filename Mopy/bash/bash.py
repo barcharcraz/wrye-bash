@@ -84,9 +84,10 @@ def SetUserPath(iniPath=None, uArg=None):
         SetHomePath(uArg)
     else:
         bashIni = bass.GetBashIni(iniPath=iniPath, reload_=iniPath is not None)
-        if bashIni and bashIni.has_option(u'General', u'sUserPath')\
-                   and not bashIni.get(u'General', u'sUserPath') == u'.':
-            SetHomePath(bashIni.get(u'General', u'sUserPath'))
+        if bashIni and bashIni.has_option(u'General', u'sUserPath'):
+            ini_usr_path = bashIni.get(u'General', u'sUserPath')
+            if not ini_usr_path == u'.':
+                SetHomePath(ini_usr_path)
 
 # Backup/Restore --------------------------------------------------------------
 def cmdBackup(opts):
