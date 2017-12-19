@@ -48,7 +48,7 @@ from . import images_list
 from bolt import GPath, deprint
 from balt import askSave, askOpen, askWarning, showError, showWarning, \
     showInfo, Link, BusyCursor, askYes
-from exception import AbstractError, BoltError
+from exception import AbstractError, BoltError, StateError
 
 opts = None # command line arguments used when launching Bash, set on bash
 
@@ -242,33 +242,43 @@ class RestoreSettings(BaseBackupSettings):
         super(RestoreSettings, self).__init__(parent, settings_file, do_quit)
         self.restore_images = handle_images
 
-    def restore_ini(self, tmp_dir):
+    @staticmethod
+    def restore_ini(tmp_dir):
+        backup_bash_ini = RestoreSettings.bash_ini_path(tmp_dir)
+        dest_dir = bass.dirs['mopy']
+        old_bash_ini = dest_dir.join(u'bash.ini')
+        timestamped_old = old_bash_ini.root.s + u'(' + bolt.timestamp() + u')' + u'.ini'
+        try:
+            old_bash_ini.moveTo(timestamped_old)
+        except StateError: # does not exist
+            timestamped_old = None
+        if backup_bash_ini is not None:
+            GPath(backup_bash_ini).copyTo(old_bash_ini)
+        return backup_bash_ini, timestamped_old
+
+    @staticmethod
+    def bash_ini_path(tmp_dir):
         # search for Bash ini
         for r, d, fs in bolt.walkdir('%s' % tmp_dir):
             for f in fs:
                 if f == u'bash.ini':
-                    bash_ini = jo(r, f)
-                    break
-            else: continue
-            break
-        else:
-            return
-        dest_dir = bass.dirs['mopy']
-        GPath(bash_ini).copyTo(dest_dir.join(u'bash.ini'))
+                    return jo(r, f)
+        return None
 
-    def extract_backup(self):
+    @staticmethod
+    def extract_backup(backup_path):
         """Extract the backup file and return the tmp directory used. If
         the backup file is a dir we assume it was created by us before
         restarting."""
-        if self._settings_file.isfile():
+        if backup_path.isfile():
             temp_dir = bolt.Path.tempDir(prefix=u'RestoreSettingsWryeBash_')
-            command = archives.extractCommand(self._settings_file, temp_dir)
-            archives.extract7z(command, self._settings_file)
+            command = archives.extractCommand(backup_path, temp_dir)
+            archives.extract7z(command, backup_path)
             return temp_dir
-        elif self._settings_file.isdir():
-            return self._settings_file
+        elif backup_path.isdir():
+            return backup_path
         raise BoltError(
-            u'%s is not a valid backup location' % self._settings_file)
+            u'%s is not a valid backup location' % backup_path)
 
     def Apply(self):
         temp_settings_restore_dir = self.extract_backup()

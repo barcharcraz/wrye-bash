@@ -285,9 +285,27 @@ def _main(opts):
 
     #--Mopy directories, set on boot, not likely to change
     _init_dirs_mopy()
+    # if HTML file generation was requested, just do it and quit
+    if opts.genHtml is not None:
+        msg1 = _(u"generating HTML file from: '%s'") % opts.genHtml
+        msg2 = _(u'done')
+        try: print msg1
+        except UnicodeError: print msg1.encode(bolt.Path.sys_fs_enc)
+        import belt # this imports bosh which imports wx (DUH)
+        bolt.WryeText.genHtml(opts.genHtml)
+        try: print msg2
+        except UnicodeError: print msg2.encode(bolt.Path.sys_fs_enc)
+        return
 
-    # Read the bash.ini file and set the bashIni global in bass TODO: restore from backup !
-    bashIni = bass.GetBashIni()
+    # We need the Mopy dirs to initialize restore settings instance
+    backup_bash_ini, timestamped_old = None, None
+    if opts.restore:
+        restore_dir = barb.RestoreSettings.extract_backup(opts.filename)
+        backup_bash_ini, timestamped_old = barb.RestoreSettings.restore_ini(
+            restore_dir)
+
+    # Read the bash.ini file and set the bashIni global in bass
+    bashIni = bass.GetBashIni(backup_bash_ini)
 
     # Detect the game we're running for ---------------------------------------
     bush_game, game_path = _import_bush_and_set_game(opts, bashIni)
@@ -301,17 +319,6 @@ def _main(opts):
     bosh.initBosh(opts.personalPath, opts.localAppDataPath, bashIni)
     try:
         env.isUAC = env.testUAC(game_path.join(u'Data'))
-        # if HTML file generation was requested, just do it and quit
-        if opts.genHtml is not None:
-            msg1 = _(u"generating HTML file from: '%s'") % opts.genHtml
-            msg2 = _(u'done')
-            try: print msg1
-            except UnicodeError: print msg1.encode(bolt.Path.sys_fs_enc)
-            import belt # this imports bosh which imports wx (DUH)
-            bolt.WryeText.genHtml(opts.genHtml)
-            try: print msg2
-            except UnicodeError: print msg2.encode(bolt.Path.sys_fs_enc)
-            return
         global basher, balt, barb
         import basher
         import barb
@@ -344,7 +351,7 @@ def _main(opts):
         app = basher.BashApp()
 
     if not is_standalone and (
-            not _rightWxVersion() or not _rightPythonVersion()): return
+        not _rightWxVersion() or not _rightPythonVersion()): return
 
     # process backup/restore options
     # quit if either is true, but only after calling both
