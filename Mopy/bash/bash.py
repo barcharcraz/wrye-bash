@@ -125,15 +125,14 @@ def cmdRestore(opts):
     backup.Apply()
     return should_quit
 
-def assure_single_instance(instance):
+def assure_single_instance():
     """Ascertain that only one instance of Wrye Bash is running.
 
     If this is the second instance running, then display an error message and
-    exit.
-
-    :type instance: wx.SingleInstanceChecker"""
-    if bass.is_restarting: # wait 3 seconds for previous instance to close
-        sleep(3)
+    exit."""
+    if bass.is_restarting: # wait 5 seconds for previous instance to close
+        sleep(5)
+    instance = _wx.SingleInstanceChecker('Wrye Bash')
     if instance.IsAnotherRunning():
         bolt.deprint(u'Only one instance of Wrye Bash can run. Exiting.')
         msg = _(u'Only one instance of Wrye Bash can run.')
@@ -268,6 +267,9 @@ def _main(opts):
     if opts.debug:
         dump_environment()
 
+    # Check if there are other instances of Wrye Bash running
+    assure_single_instance()
+
     # ensure we are in the correct directory so relative paths will work
     # properly
     if is_standalone:
@@ -280,9 +282,6 @@ def _main(opts):
         os.chdir(pathToProg)
     del pathToProg
 
-    # Check if there are other instances of Wrye Bash running
-    instance = _wx.SingleInstanceChecker('Wrye Bash')
-    assure_single_instance(instance)
 
     # Detect the game we're running for ---------------------------------------
     import bush
