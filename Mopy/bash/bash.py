@@ -282,12 +282,15 @@ def _main(opts):
         os.chdir(pathToProg)
     del pathToProg
 
+    #--Mopy directories, set on boot, not likely to change
+    _init_dirs_mopy()
+
+    # Read the bash.ini file and set the bashIni global in bass TODO: restore from backup !
+    bashIni = bass.GetBashIni()
 
     # Detect the game we're running for ---------------------------------------
     import bush
     bolt.deprint (u'Searching for game to manage:')
-    # set the Bash ini global in bass
-    bashIni = bass.GetBashIni()
     ret = bush.detect_and_set_game(opts.oblivionPath, bashIni)
     if ret is not None: # None == success
         if len(ret) == 0:
@@ -394,6 +397,16 @@ def _main(opts):
 
     app.Init() # Link.Frame is set here !
     app.MainLoop()
+
+def _init_dirs_mopy():
+    dirs = bass.dirs
+    dirs['mopy'] = bolt.Path.getcwd().root
+    dirs['bash'] = dirs['mopy'].join(u'bash')
+    dirs['compiled'] = dirs['bash'].join(u'compiled')
+    dirs['l10n'] = dirs['bash'].join(u'l10n')
+    dirs['db'] = dirs['bash'].join(u'db')
+    dirs['templates'] = dirs['mopy'].join(u'templates')
+    dirs['images'] = dirs['bash'].join(u'images')
 
 def _show_wx_error(msg):
     """Shows an error message in a wx window."""

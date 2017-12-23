@@ -43,7 +43,6 @@ import archives
 import bash
 import bass
 import bolt
-import bosh
 import bush
 from . import images_list
 from bolt import GPath, deprint
@@ -163,6 +162,7 @@ class BackupSettings(BaseBackupSettings):
 
         #backup save profile settings
         savedir = GPath(u'My Games').join(game)
+        import bosh # FIXME(ut) - move this code out of init
         profiles = [u''] + bosh.SaveInfos.getLocalSaveDirs()
         for profile in profiles:
             pluginsTxt = (u'Saves', profile, u'plugins.txt')
@@ -241,6 +241,20 @@ class RestoreSettings(BaseBackupSettings):
         super(RestoreSettings, self).__init__(parent, settings_file, do_quit)
         self.restore_images = handle_images
 
+    def restore_ini(self, tmp_dir):
+        # search for Bash ini
+        for r, d, fs in bolt.walkdir('%s' % tmp_dir):
+            for f in fs:
+                if f == u'bash.ini':
+                    bash_ini = jo(r, f)
+                    break
+            else: continue
+            break
+        else:
+            return
+        dest_dir = bass.dirs['mopy']
+        GPath(bash_ini).copyTo(dest_dir.join(u'bash.ini'))
+
     def Apply(self):
         temp_settings_restore_dir = bolt.Path.tempDir()
         try:
@@ -293,6 +307,7 @@ class RestoreSettings(BaseBackupSettings):
         bash.SetUserPath(tmpBash.s,opts.userPath)
 
         bashIni = bass.GetBashIni(tmpBash.s, reload_=True)
+        import bosh
         bosh.initBosh(opts.personalPath, opts.localAppDataPath, bashIni)
 
         # restore all the settings files
@@ -302,12 +317,11 @@ class RestoreSettings(BaseBackupSettings):
                 (dirs['images'], jo(game, u'Mopy', u'bash', u'images'))]
         for dest_dir, back_path in restore_paths:
             full_back_path = temp_dir.join(back_path)
-            if full_back_path.exists():
-                for name in full_back_path.list():
-                    if full_back_path.join(name).isfile():
-                        deprint(GPath(back_path).join(name).s + u' --> '
-                                + dest_dir.join(name).s)
-                        full_back_path.join(name).copyTo(dest_dir.join(name))
+            for name in full_back_path.list():
+                if full_back_path.join(name).isfile():
+                    deprint(GPath(back_path).join(
+                        name).s + u' --> ' + dest_dir.join(name).s)
+                    full_back_path.join(name).copyTo(dest_dir.join(name))
 
         #restore savegame profile settings
         back_path = GPath(u'My Games').join(game, u'Saves')
