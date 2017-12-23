@@ -33,6 +33,7 @@ from ..bolt import deprint, GPath
 from . import BashFrame, BashStatusBar
 from .dialogs import ColorDialog
 from .app_buttons import App_Button # TODO(ut): ugly
+from ..exception import BoltError
 # TODO(ut): settings links do not seem to use Link.data attribute - it's None..
 
 __all__ = ['Settings_BackupSettings', 'Settings_RestoreSettings',
@@ -99,17 +100,33 @@ class Settings_RestoreSettings(ItemLink):
                            u'settings are restored.')
         if not balt.askYes(Link.Frame, msg, _(u'Restore Bash Settings?')):
             return
-        backup = barb.RestoreSettings.get_backup_instance(
+        backup = barb.RestoreSettings.get_backup_instance( # type: barb.RestoreSettings
             Link.Frame, settings_file=None) # prompt for backup filename
         if not backup: return
+        backup_dir = None
+        restarting = False
         try:
-            backup.restore_images = balt.askYes(Link.Frame,
+            with balt.BusyCursor():
+                backup_dir = backup.extract_backup()
+            if backup.incompatible_backup(backup_dir): return
+            restarting = True
+            backup.restore_images = self._askYes(
                 _(u'Do you want to restore saved images as well as settings?'),
                 _(u'Restore Settings'))
-            with balt.BusyCursor(): backup.Apply()
+            self._showInfo('\n'.join([
+                _(u'Your Bash settings have been successfully extracted.'),
+                _(u'Backup Path: ') + backup._settings_file.s, u'',
+                _(u'Before the settings can take effect, Wrye Bash must restart.'),
+                _(u'Click OK to restart now.')]), _(u'Bash Settings Extracted'))
+            Link.Frame.Restart(['--restore'], ['--filename', backup_dir.s])
         except exception.StateError:
             deprint(u'Restore settings failed:', traceback=True)
             backup.WarnFailed()
+        except BoltError:
+            self._showError(u'Invalid backup path: %s' % backup._settings_file)
+        finally:
+            if not restarting and backup_dir is not None:
+                backup_dir.rmtree(safety=u'RestoreSettingsWryeBash_')
 
 #------------------------------------------------------------------------------
 class Settings_SaveSettings(ItemLink):

@@ -116,11 +116,11 @@ def cmdBackup(opts):
 
 def cmdRestore(opts):
     # restore settings on user request
-    if not opts.restore: return False
+    if not opts.restore or not opts.filename: return False # Warn!
     global basher, balt, barb
     if not basher: import basher, balt, barb
     should_quit = opts.quietquit
-    backup = barb.RestoreSettings.get_backup_instance(balt.Link.Frame,
+    backup = barb.RestoreSettings(balt.Link.Frame,
         opts.filename or None, should_quit, opts.backup_images)
     if not backup : return False
     backup.Apply()
@@ -290,17 +290,17 @@ def _main(opts):
     bashIni = bass.GetBashIni()
 
     # Detect the game we're running for ---------------------------------------
-    bush_game, game_path = _set_game(opts, bashIni)
+    bush_game, game_path = _import_bush_and_set_game(opts, bashIni)
     if not bush_game: return
     # from now on bush.game is set
 
     #--Initialize Directories and some settings
     #  required before the rest has imported
     SetUserPath(uArg=opts.userPath)
+    import bosh # this imports balt (DUH) which imports wx
+    bosh.initBosh(opts.personalPath, opts.localAppDataPath, bashIni)
     try:
-        import bosh # this imports balt (DUH) which imports wx
         env.isUAC = env.testUAC(game_path.join(u'Data'))
-        bosh.initBosh(opts.personalPath, opts.localAppDataPath, bashIni)
         # if HTML file generation was requested, just do it and quit
         if opts.genHtml is not None:
             msg1 = _(u"generating HTML file from: '%s'") % opts.genHtml
@@ -344,7 +344,7 @@ def _main(opts):
         app = basher.BashApp()
 
     if not is_standalone and (
-        not _rightWxVersion() or not _rightPythonVersion()): return
+            not _rightWxVersion() or not _rightPythonVersion()): return
 
     # process backup/restore options
     # quit if either is true, but only after calling both

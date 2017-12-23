@@ -308,11 +308,8 @@ class RestoreSettings(BaseBackupSettings):
         return False
 
     def _Apply(self, temp_dir):
-        if self.incompatible_backup(temp_dir): return
-
         deprint(u'')
         deprint(_(u'RESTORE BASH SETTINGS: ') + self._settings_file.s)
-
         # reinitialize bass.dirs using the backup copy of bash.ini if it exists
         game, dirs = bush.game.fsName, bass.dirs
         tmpBash = temp_dir.join(game, u'Mopy', u'bash.ini')
@@ -349,14 +346,9 @@ class RestoreSettings(BaseBackupSettings):
                     full_back_path.join(root_dir, name).copyTo(
                         saves_dir.join(root_dir, name))
 
-        # tell the user the restore is complete and warn about restart
-        self.WarnRestart()
-        if Link.Frame: # should always exist
-            Link.Frame.Destroy()
-
     @staticmethod
     def _get_backup_filename(parent, filename, do_quit):
-        if filename is None or filename.cext != u'.7z' or not filename.isfile():
+        if filename is None or (filename.isfile() and filename.cext != u'.7z'):
             # former may be None
             base_dir = bass.settings['bash.backupPath'] or bass.dirs[
                 'modsBash']
@@ -369,12 +361,3 @@ class RestoreSettings(BaseBackupSettings):
             _(u'There was an error while trying to restore your settings from '
               u'the backup file!'), _(u'No settings were restored.')]),
                     _(u'Unable to restore backup!'))
-
-    def WarnRestart(self):
-        if self.quit: return
-        showWarning(self.parent, '\n'.join([
-            _(u'Your Bash settings have been successfully restored.'),
-            _(u'Backup Path: ') + self._settings_file.s, u'',
-            _(u'Before the settings can take effect, Wrye Bash must restart.'),
-            _(u'Click OK to restart now.')]), _(u'Bash Settings Restored'))
-        Link.Frame.Restart()
