@@ -227,7 +227,9 @@ class ConfigHelpers:
             deprint(u'Using LOOT API version:', loot_api.Version.string())
             try:
                 gameType = self.getLootApiGameType(bush.game.fsName)
-                lootDb = loot_api.create_database(gameType, bass.dirs['app'].s)
+                loot_api.initialise_locale('')
+                loot_game = loot_api.create_game_handle(gameType, bass.dirs['app'].s)
+                lootDb = loot_game.get_database()
             except OSError:
                 deprint(u'The LOOT API failed to initialize', traceback=True)
                 lootDb = None
@@ -304,7 +306,7 @@ class ConfigHelpers:
             if lootDb is None:
                 tags = (set(), set(), set())
             else:
-                tags = lootDb.get_plugin_tags(modName.s)
+                tags = lootDb.get_plugin_tags(modName.s, True)
                 tags = (tags.added, tags.removed, tags.userlist_modified)
             self.tagCache[modName] = tags
             return tags
@@ -334,7 +336,7 @@ class ConfigHelpers:
     def getDirtyMessage(modName):
         if lootDb is None:
             return False, u''
-        if lootDb.get_plugin_cleanliness(modName.s) == loot_api.PluginCleanliness.dirty:
+        if lootDb.get_plugin_cleanliness(modName.s, True) == loot_api.PluginCleanliness.dirty:
             return True, 'Contains dirty edits, needs cleaning.'
         else:
             return False, ''
