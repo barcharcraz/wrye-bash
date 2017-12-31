@@ -32,7 +32,7 @@ class MreAmmo(MelRecord):
     """Ammo record (arrows)"""
     classType = 'AMMO'
 
-    AmmoTypeFlags = Flags(0L,Flags.getNames(
+    AmmoTypeFlags = Flags(0,Flags.getNames(
         (0, 'notNormalWeapon'),
         (1, 'nonPlayable'),
         (2, 'nonBolt'),
@@ -53,7 +53,7 @@ class MreAmmo(MelRecord):
             for attr,value,action in zip(self.attrs,unpacked,self.actions):
                 if callable(action): value = action(value)
                 setter(attr,value)
-            if self._debug: print unpacked
+            if self._debug: print(unpacked)
 
     melSet = MelSet(
         MelString('EDID','eid'),
@@ -68,7 +68,7 @@ class MreAmmo(MelRecord):
         MelLString('DESC','description'),
         MelCountedFidList('KWDA', 'keywords', 'KSIZ', '<I'),
         MelAmmoData('DATA', 'IIfIf', (FID, 'projectile'),
-            (AmmoTypeFlags, 'flags', 0L), ('damage', 1.0), ('value', 0),
+            (AmmoTypeFlags, 'flags', 0), ('damage', 1.0), ('value', 0),
             ('weight', 0.1)),
         MelString('ONAM','onam_n'),
         )
@@ -79,7 +79,7 @@ class MreLtex(MelRecord):
     """Landscape Texture."""
     classType = 'LTEX'
 
-    LtexSnowFlags = Flags(0L,Flags.getNames(
+    LtexSnowFlags = Flags(0,Flags.getNames(
             (0, 'snow'),
         ))
 
@@ -90,7 +90,7 @@ class MreLtex(MelRecord):
         MelStruct('HNAM','BB','friction','restitution',),
         MelStruct('SNAM','B','textureSpecularExponent',),
         MelFids('GNAM','grasses'),
-        MelStruct('INAM','I',(LtexSnowFlags,'flags',0L),),
+        MelStruct('INAM','I',(LtexSnowFlags,'flags',0),),
         )
     __slots__ = MelRecord.__slots__ + melSet.getSlotsUsed()
 
@@ -99,11 +99,11 @@ class MreMato(MelRecord):
     """Material Object Records"""
     classType = 'MATO'
 
-    MatoTypeFlags = Flags(0L,Flags.getNames(
+    MatoTypeFlags = Flags(0,Flags.getNames(
             (0, 'singlePass'),
         ))
 
-    MatoSnowFlags = Flags(0L,Flags.getNames(
+    MatoSnowFlags = Flags(0,Flags.getNames(
             (0, 'snow'),
         ))
 
@@ -130,8 +130,8 @@ class MreMato(MelRecord):
                     'projectionVectorY','projectionVectorZ','normalDampener',
                     'singlePassColorRed','singlePassColorGreen',
                     'singlePassColorBlue',
-                    (MatoTypeFlags,'singlePassFlags',0L),
-                    (MatoSnowFlags,'snowflags',0L),'unkMato1'),
+                    (MatoTypeFlags,'singlePassFlags',0),
+                    (MatoSnowFlags,'snowflags',0),'unkMato1'),
     )
     __slots__ = MelRecord.__slots__ + melSet.getSlotsUsed()
 
@@ -167,7 +167,7 @@ class MreStat(MelRecord):
     """Static model record."""
     classType = 'STAT'
 
-    StatSnowFlags = Flags(0L,Flags.getNames(
+    StatSnowFlags = Flags(0,Flags.getNames(
             (0, 'consideredSnow'),
         ))
 
@@ -188,7 +188,7 @@ class MreStat(MelRecord):
         MelBounds(),
         MelModel(),
         MelStatDnam('DNAM','fIB3s','maxAngle30to120',(FID,'material'),
-                    (StatSnowFlags,'snowflag',0L),('unkStat1',null3),),
+                    (StatSnowFlags,'snowflag',0),('unkStat1',null3),),
         # Contains null-terminated mesh filename followed by random data
         # up to 260 bytes and repeats 4 times
         MelBase('MNAM','distantLOD'),
@@ -200,7 +200,7 @@ class MreWatr(MelRecord):
     """Water"""
     classType = 'WATR'
 
-    WatrTypeFlags = Flags(0L,Flags.getNames(
+    WatrTypeFlags = Flags(0,Flags.getNames(
             (0, 'causesDamage'),
         ))
 
@@ -223,7 +223,7 @@ class MreWatr(MelRecord):
             MelString('NNAM','noiseMap',),
             ),
         MelStruct('ANAM','B','opacity'),
-        MelStruct('FNAM','B',(WatrTypeFlags,'flags',0L),),
+        MelStruct('FNAM','B',(WatrTypeFlags,'flags',0),),
         MelBase('MNAM','unused1'),
         MelFid('TNAM','material',),
         MelFid('SNAM','openSound',),
@@ -293,7 +293,7 @@ class MreWeap(MelRecord):
     classType = 'WEAP'
 
     # 'On Death'
-    WeapFlags3 = Flags(0L,Flags.getNames(
+    WeapFlags3 = Flags(0,Flags.getNames(
         (0, 'onDeath'),
     ))
 
@@ -311,7 +311,7 @@ class MreWeap(MelRecord):
     # {0x00000800}'Unknown 12',
     # {0x00001000}'Non-hostile',
     # {0x00002000}'Bound Weapon'
-    WeapFlags2 = Flags(0L,Flags.getNames(
+    WeapFlags2 = Flags(0,Flags.getNames(
             (0, 'playerOnly'),
             (1, 'nPCsUseAmmo'),
             (2, 'noJamAfterReloadunused'),
@@ -336,7 +336,7 @@ class MreWeap(MelRecord):
     # {0x0020}'Embedded Weapon (unused)',
     # {0x0040}'Don''t Use 1st Person IS Anim (unused)',
     # {0x0080}'Non-playable'
-    WeapFlags1 = Flags(0L,Flags.getNames(
+    WeapFlags1 = Flags(0,Flags.getNames(
             (0, 'ignoresNormalWeaponResistance'),
             (1, 'automaticunused'),
             (2, 'hasScopeunused'),
@@ -400,7 +400,7 @@ class MreWeap(MelRecord):
                   'rumbleDuration',('dnamUnk5',null4+null4+null4),'skill',
                   ('dnamUnk6',null4+null4),'resist',('dnamUnk7',null4),'stagger',),
         MelWeapCrdt('CRDT','H2sfB3s4sI4s','critDamage',('crdtUnk1',null2),
-                  'criticalMultiplier',(WeapFlags3,'criticalFlags',0L),
+                  'criticalMultiplier',(WeapFlags3,'criticalFlags',0),
                   ('crdtUnk2',null3),('crdtUnk3',null4),
                   (FID,'criticalEffect',None),('crdtUnk4',null4),),
         MelStruct('VNAM','I','detectionSoundLevel'),
@@ -413,7 +413,7 @@ class MreWthr(MelRecord):
     """Weather"""
     classType = 'WTHR'
 
-    WthrFlags2 = Flags(0L,Flags.getNames(
+    WthrFlags2 = Flags(0,Flags.getNames(
             (0, 'layer_0'),
             (1, 'layer_1'),
             (2, 'layer_2'),
@@ -454,7 +454,7 @@ class MreWthr(MelRecord):
     # {0x08} 'Weather - Snow',
     # {0x10} 'Sky Statics - Always Visible',
     # {0x20} 'Sky Statics - Follows Sun Position'
-    WthrFlags1 = Flags(0L,Flags.getNames(
+    WthrFlags1 = Flags(0,Flags.getNames(
             (0, 'weatherPleasant'),
             (1, 'weatherCloudy'),
             (2, 'weatherRainy'),
@@ -481,7 +481,7 @@ class MreWthr(MelRecord):
             for attr,value,action in zip(self.attrs,unpacked,self.actions):
                 if callable(action): value = action(value)
                 setter(attr,value)
-            if self._debug: print unpacked
+            if self._debug: print(unpacked)
 
     melSet = MelSet(
         MelString('EDID','eid'),
@@ -543,10 +543,10 @@ class MreWthr(MelRecord):
                   'sunGlare','sunDamage','precipitationBeginFadeIn',
                   'precipitationEndFadeOut','thunderLightningBeginFadeIn',
                   'thunderLightningEndFadeOut','thunderLightningFrequency',
-                  (WthrFlags1,'wthrFlags1',0L),'red','green','blue',
+                  (WthrFlags1,'wthrFlags1',0),'red','green','blue',
                   'visualEffectBegin','visualEffectEnd',
                   'windDirection','windDirectionRange',),
-        MelStruct('NAM1','I',(WthrFlags2,'wthrFlags2',0L),),
+        MelStruct('NAM1','I',(WthrFlags2,'wthrFlags2',0),),
         MelStructs('SNAM','2I','sounds',(FID,'sound'),'type'),
         MelFids('TNAM','skyStatics',),
         MelStruct('IMSP','4I',(FID,'imageSpacesSunrise'),(FID,'imageSpacesDay'),
@@ -600,7 +600,7 @@ class MreLens(MelRecord):
     """Lens Flare"""
     classType = 'LENS'
 
-    LensFlareFlags = Flags(0L,Flags.getNames(
+    LensFlareFlags = Flags(0,Flags.getNames(
             (0, 'rotates'),
             (1, 'shrinksWhenOccluded'),
         ))
@@ -615,7 +615,7 @@ class MreLens(MelRecord):
             MelString('FNAM','texture'),
             MelStruct('LFSD', 'f8I', 'tintRed', 'tintGreen', 'tintBlue',
                 'width', 'height', 'position', 'angularFade', 'opacity',
-                (LensFlareFlags, 'lensFlags', 0L), ),
+                (LensFlareFlags, 'lensFlags', 0), ),
             )
         )
     __slots__ = MelRecord.__slots__ + melSet.getSlotsUsed()

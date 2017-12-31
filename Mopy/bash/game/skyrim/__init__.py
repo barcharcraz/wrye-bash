@@ -46,114 +46,114 @@ from ...bolt import struct_pack, struct_unpack
 from ...brec import MreGlob
 
 #--Name of the game to use in UI.
-displayName = u'Skyrim'
+displayName = 'Skyrim'
 #--Name of the game's filesystem folder.
-fsName = u'Skyrim'
+fsName = 'Skyrim'
 #--Alternate display name to use instead of "Wrye Bash for ***"
-altName = u'Wrye Smash'
+altName = 'Wrye Smash'
 #--Name of game's default ini file.
-defaultIniFile = u'Skyrim_default.ini'
+defaultIniFile = 'Skyrim_default.ini'
 
 #--Exe to look for to see if this is the right game
-exe = u'TESV.exe'
+exe = 'TESV.exe'
 
 #--Registry keys to read to find the install location
-regInstallKeys = (u'Bethesda Softworks\\Skyrim', u'Installed Path')
+regInstallKeys = ('Bethesda Softworks\\Skyrim', 'Installed Path')
 
 #--patch information
-patchURL = u'' # Update via steam
-patchTip = u'Update via Steam'
+patchURL = '' # Update via steam
+patchTip = 'Update via Steam'
 
 #--URL to the Nexus site for this game
-nexusUrl = u'http://www.nexusmods.com/skyrim/'
-nexusName = u'Skyrim Nexus'
+nexusUrl = 'http://www.nexusmods.com/skyrim/'
+nexusName = 'Skyrim Nexus'
 nexusKey = 'bash.installers.openSkyrimNexus.continue'
 
 # Bsa info
 allow_reset_bsa_timestamps = False
-bsa_extension = ur'bsa'
+bsa_extension = r'bsa'
 supports_mod_inis = True
 vanilla_string_bsas = {
-    u'skyrim.esm': [u'Skyrim - Interface.bsa'],
-    u'update.esm': [u'Skyrim - Interface.bsa'],
-    u'dawnguard.esm': [u'Dawnguard.bsa'],
-    u'hearthfires.esm': [u'Hearthfires.bsa'],
-    u'dragonborn.esm': [u'Dragonborn.bsa'],
+    'skyrim.esm': ['Skyrim - Interface.bsa'],
+    'update.esm': ['Skyrim - Interface.bsa'],
+    'dawnguard.esm': ['Dawnguard.bsa'],
+    'hearthfires.esm': ['Hearthfires.bsa'],
+    'dragonborn.esm': ['Dragonborn.bsa'],
 }
-resource_archives_keys = (u'sResourceArchiveList', u'sResourceArchiveList2')
+resource_archives_keys = ('sResourceArchiveList', 'sResourceArchiveList2')
 
 # plugin extensions
-espm_extensions = {u'.esp', u'.esm'}
+espm_extensions = {'.esp', '.esm'}
 
 # Load order info
 using_txt_file = True
 
 #--Creation Kit Set information
 class cs:
-    shortName = u'CK'                # Abbreviated name
-    longName = u'Creation Kit'       # Full name
-    exe = u'CreationKit.exe'         # Executable to run
+    shortName = 'CK'                # Abbreviated name
+    longName = 'Creation Kit'       # Full name
+    exe = 'CreationKit.exe'         # Executable to run
     seArgs = None # u'-editor'       # Argument to pass to the SE to load the CS # Not yet needed
-    imageName = u'creationkit%s.png' # Image name template for the status bar
+    imageName = 'creationkit%s.png' # Image name template for the status bar
 
 #--Script Extender information
 class se:
-    shortName = u'SKSE'                      # Abbreviated name
-    longName = u'Skyrim Script Extender'     # Full name
-    exe = u'skse_loader.exe'                 # Exe to run
-    steamExe = u'skse_loader.exe'            # Exe to run if a steam install
-    url = u'http://skse.silverlock.org/'     # URL to download from
-    urlTip = u'http://skse.silverlock.org/'  # Tooltip for mouse over the URL
+    shortName = 'SKSE'                      # Abbreviated name
+    longName = 'Skyrim Script Extender'     # Full name
+    exe = 'skse_loader.exe'                 # Exe to run
+    steamExe = 'skse_loader.exe'            # Exe to run if a steam install
+    url = 'http://skse.silverlock.org/'     # URL to download from
+    urlTip = 'http://skse.silverlock.org/'  # Tooltip for mouse over the URL
 
 #--Script Dragon
 class sd:
-    shortName = u'SD'
-    longName = u'Script Dragon'
-    installDir = u'asi'
+    shortName = 'SD'
+    longName = 'Script Dragon'
+    installDir = 'asi'
 
 #--SkyProc Patchers
 class sp:
-    shortName = u'SP'
-    longName = u'SkyProc'
-    installDir = u'SkyProc Patchers'
+    shortName = 'SP'
+    longName = 'SkyProc'
+    installDir = 'SkyProc Patchers'
 
 #--Quick shortcut for combining the SE and SD names
-se_sd = se.shortName+u'/'+sd.longName
+se_sd = se.shortName+'/'+sd.longName
 
 #--Graphics Extender information
 class ge:
-    shortName = u''
-    longName = u''
-    exe = u'**DNE**'
-    url = u''
-    urlTip = u''
+    shortName = ''
+    longName = ''
+    exe = '**DNE**'
+    url = ''
+    urlTip = ''
 
 #--4gb Launcher
 class laa:
     # Skyrim has a 4gb Launcher, but as of patch 1.3.10, it is
     # no longer required (Bethsoft updated TESV.exe to already
     # be LAA)
-    name = u''
-    exe = u'**DNE**'
+    name = ''
+    exe = '**DNE**'
     launchesSE = False
 
 # Files BAIN shouldn't skip
 dontSkip = (
        # These are all in the Interface folder. Apart from the skyui_ files,
        # they are all present in vanilla.
-       u'skyui_cfg.txt',
-       u'skyui_translate.txt',
-       u'credits.txt',
-       u'credits_french.txt',
-       u'fontconfig.txt',
-       u'controlmap.txt',
-       u'gamepad.txt',
-       u'mouse.txt',
-       u'keyboard_english.txt',
-       u'keyboard_french.txt',
-       u'keyboard_german.txt',
-       u'keyboard_spanish.txt',
-       u'keyboard_italian.txt',
+       'skyui_cfg.txt',
+       'skyui_translate.txt',
+       'credits.txt',
+       'credits_french.txt',
+       'fontconfig.txt',
+       'controlmap.txt',
+       'gamepad.txt',
+       'mouse.txt',
+       'keyboard_english.txt',
+       'keyboard_french.txt',
+       'keyboard_german.txt',
+       'keyboard_spanish.txt',
+       'keyboard_italian.txt',
 )
 
 # Directories where specific file extensions should not be skipped by BAIN
@@ -165,7 +165,7 @@ dontSkipDirs = {
 #Folders BAIN should never check
 SkipBAINRefresh = {
     #Use lowercase names
-    u'tes5edit backups',
+    'tes5edit backups',
 }
 
 #--Some stuff dealing with INI files
@@ -175,28 +175,28 @@ class ini:
     allowNewLines = True
 
     #--INI Entry to enable BSA Redirection
-    bsaRedirection = (u'',u'')
+    bsaRedirection = ('','')
 
 #--Save Game format stuff
 class ess:
     # Save file capabilities
     canReadBasic = True         # All the basic stuff needed for the Saves Tab
     canEditMore = False         # No advanced editing
-    ext = u'.ess'               # Save file extension
+    ext = '.ess'               # Save file extension
 
 #--INI files that should show up in the INI Edits tab
 iniFiles = [
-    u'Skyrim.ini',
-    u'SkyrimPrefs.ini',
+    'Skyrim.ini',
+    'SkyrimPrefs.ini',
     ]
 
 #--INI setting to setup Save Profiles
-saveProfilesKey = (u'General',u'SLocalSavePath')
+saveProfilesKey = ('General','SLocalSavePath')
 
 #--The main plugin Wrye Bash should look for
 masterFiles = [
-    u'Skyrim.esm',
-    u'Update.esm',
+    'Skyrim.esm',
+    'Update.esm',
     ]
 
 #The pickle file for this game. Holds encoded GMST IDs from the big list below.
@@ -204,84 +204,84 @@ pklfile = r'bash\db\Skyrim_ids.pkl'
 
 #--BAIN: Directories that are OK to install to
 dataDirs = {
-    u'dialogueviews',
-    u'interface',
-    u'meshes',
-    u'strings',
-    u'textures',
-    u'video',
-    u'lodsettings',
-    u'grass',
-    u'scripts',
-    u'shadersfx',
-    u'music',
-    u'sound',
-    u'seq',
+    'dialogueviews',
+    'interface',
+    'meshes',
+    'strings',
+    'textures',
+    'video',
+    'lodsettings',
+    'grass',
+    'scripts',
+    'shadersfx',
+    'music',
+    'sound',
+    'seq',
 }
 dataDirsPlus = {
-    u'skse',
-    u'ini',
-    u'asi',
-    u'skyproc patchers',
-    u'calientetools', # bodyslide
-    u'dyndolod',
-    u'tools',
+    'skse',
+    'ini',
+    'asi',
+    'skyproc patchers',
+    'calientetools', # bodyslide
+    'dyndolod',
+    'tools',
 }
 
 # Installer -------------------------------------------------------------------
 # ensure all path strings are prefixed with 'r' to avoid interpretation of
 #   accidental escape sequences
 wryeBashDataFiles = {
-    u'Bashed Patch.esp',
-    u'Bashed Patch, 0.esp',
-    u'Bashed Patch, 1.esp',
-    u'Bashed Patch, 2.esp',
-    u'Bashed Patch, 3.esp',
-    u'Bashed Patch, 4.esp',
-    u'Bashed Patch, 5.esp',
-    u'Bashed Patch, 6.esp',
-    u'Bashed Patch, 7.esp',
-    u'Bashed Patch, 8.esp',
-    u'Bashed Patch, 9.esp',
-    u'Bashed Patch, CBash.esp',
-    u'Bashed Patch, Python.esp',
-    u'Bashed Patch, Warrior.esp',
-    u'Bashed Patch, Thief.esp',
-    u'Bashed Patch, Mage.esp',
-    u'Bashed Patch, Test.esp',
-    u'Docs\\Bash Readme Template.html',
-    u'Docs\\wtxt_sand_small.css',
-    u'Docs\\wtxt_teal.css',
-    u'Docs\\Bash Readme Template.txt',
-    u'Docs\\Bashed Patch, 0.html',
-    u'Docs\\Bashed Patch, 0.txt',
+    'Bashed Patch.esp',
+    'Bashed Patch, 0.esp',
+    'Bashed Patch, 1.esp',
+    'Bashed Patch, 2.esp',
+    'Bashed Patch, 3.esp',
+    'Bashed Patch, 4.esp',
+    'Bashed Patch, 5.esp',
+    'Bashed Patch, 6.esp',
+    'Bashed Patch, 7.esp',
+    'Bashed Patch, 8.esp',
+    'Bashed Patch, 9.esp',
+    'Bashed Patch, CBash.esp',
+    'Bashed Patch, Python.esp',
+    'Bashed Patch, Warrior.esp',
+    'Bashed Patch, Thief.esp',
+    'Bashed Patch, Mage.esp',
+    'Bashed Patch, Test.esp',
+    'Docs\\Bash Readme Template.html',
+    'Docs\\wtxt_sand_small.css',
+    'Docs\\wtxt_teal.css',
+    'Docs\\Bash Readme Template.txt',
+    'Docs\\Bashed Patch, 0.html',
+    'Docs\\Bashed Patch, 0.txt',
 }
 wryeBashDataDirs = {
-    u'Bash Patches',
-    u'INI Tweaks'
+    'Bash Patches',
+    'INI Tweaks'
 }
 ignoreDataFiles = {
 }
 ignoreDataFilePrefixes = {
 }
 ignoreDataDirs = {
-    u'LSData'
+    'LSData'
 }
 
 #--Tags supported by this game
 allTags = sorted((
-    u'C.Acoustic', u'C.Climate', u'C.Encounter', u'C.ImageSpace', u'C.Light',
-    u'C.Location', u'C.SkyLighting', u'C.Music', u'C.Name', u'C.Owner',
-    u'C.RecordFlags', u'C.Regions', u'C.Water', u'Deactivate', u'Delev',
-    u'Filter', u'Graphics', u'Invent', u'NoMerge', u'Relev', u'Sound',
-    u'Stats', u'Names',
+    'C.Acoustic', 'C.Climate', 'C.Encounter', 'C.ImageSpace', 'C.Light',
+    'C.Location', 'C.SkyLighting', 'C.Music', 'C.Name', 'C.Owner',
+    'C.RecordFlags', 'C.Regions', 'C.Water', 'Deactivate', 'Delev',
+    'Filter', 'Graphics', 'Invent', 'NoMerge', 'Relev', 'Sound',
+    'Stats', 'Names',
     ))
 
 #--Gui patcher classes available when building a Bashed Patch
 patchers = (
-    u'AliasesPatcher', u'CellImporter', u'GmstTweaker', u'GraphicsPatcher',
-    u'ImportInventory', u'ListsMerger', u'PatchMerger', u'SoundPatcher',
-    u'StatsPatcher', u'NamesPatcher',
+    'AliasesPatcher', 'CellImporter', 'GmstTweaker', 'GraphicsPatcher',
+    'ImportInventory', 'ListsMerger', 'PatchMerger', 'SoundPatcher',
+    'StatsPatcher', 'NamesPatcher',
     )
 
 #--CBash Gui patcher classes available when building a Bashed Patch
@@ -289,39 +289,39 @@ CBash_patchers = tuple()
 
 # Magic Info ------------------------------------------------------------------
 weaponTypes = (
-    _(u'Blade (1 Handed)'),
-    _(u'Blade (2 Handed)'),
-    _(u'Blunt (1 Handed)'),
-    _(u'Blunt (2 Handed)'),
-    _(u'Staff'),
-    _(u'Bow'),
+    _('Blade (1 Handed)'),
+    _('Blade (2 Handed)'),
+    _('Blunt (1 Handed)'),
+    _('Blunt (2 Handed)'),
+    _('Staff'),
+    _('Bow'),
     )
 
 # Race Info -------------------------------------------------------------------
 raceNames = {
-    0x13740 : _(u'Argonian'),
-    0x13741 : _(u'Breton'),
-    0x13742 : _(u'Dark Elf'),
-    0x13743 : _(u'High Elf'),
-    0x13744 : _(u'Imperial'),
-    0x13745 : _(u'Khajiit'),
-    0x13746 : _(u'Nord'),
-    0x13747 : _(u'Orc'),
-    0x13748 : _(u'Redguard'),
-    0x13749 : _(u'Wood Elf'),
+    0x13740 : _('Argonian'),
+    0x13741 : _('Breton'),
+    0x13742 : _('Dark Elf'),
+    0x13743 : _('High Elf'),
+    0x13744 : _('Imperial'),
+    0x13745 : _('Khajiit'),
+    0x13746 : _('Nord'),
+    0x13747 : _('Orc'),
+    0x13748 : _('Redguard'),
+    0x13749 : _('Wood Elf'),
     }
 
 raceShortNames = {
-    0x13740 : u'Arg',
-    0x13741 : u'Bre',
-    0x13742 : u'Dun',
-    0x13743 : u'Alt',
-    0x13744 : u'Imp',
-    0x13745 : u'Kha',
-    0x13746 : u'Nor',
-    0x13747 : u'Orc',
-    0x13748 : u'Red',
-    0x13749 : u'Bos',
+    0x13740 : 'Arg',
+    0x13741 : 'Bre',
+    0x13742 : 'Dun',
+    0x13743 : 'Alt',
+    0x13744 : 'Imp',
+    0x13745 : 'Kha',
+    0x13746 : 'Nor',
+    0x13747 : 'Orc',
+    0x13748 : 'Red',
+    0x13749 : 'Bos',
     }
 
 raceHairMale = {
@@ -362,9 +362,9 @@ class esp:
 
     #--Strings Files
     stringsFiles = [
-        ((u'Strings',), u'%(body)s_%(language)s.STRINGS'),
-        ((u'Strings',), u'%(body)s_%(language)s.DLSTRINGS'),
-        ((u'Strings',), u'%(body)s_%(language)s.ILSTRINGS'),
+        (('Strings',), '%(body)s_%(language)s.STRINGS'),
+        (('Strings',), '%(body)s_%(language)s.DLSTRINGS'),
+        (('Strings',), '%(body)s_%(language)s.ILSTRINGS'),
     ]
 
 #------------------------------------------------------------------------------

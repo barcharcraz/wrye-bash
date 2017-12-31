@@ -30,14 +30,14 @@
 #  prober, due to Python 2.7.2 not having the EUC-TW codec.
 ######################### END LICENSE BLOCK #########################
 
-from charsetgroupprober import CharSetGroupProber
-from utf8prober import UTF8Prober
-from sjisprober import SJISProber
-from eucjpprober import EUCJPProber
-from gb2312prober import GB2312Prober
-from euckrprober import EUCKRProber
-from big5prober import Big5Prober
-from euctwprober import EUCTWProber
+from .charsetgroupprober import CharSetGroupProber
+from .utf8prober import UTF8Prober
+from .sjisprober import SJISProber
+from .eucjpprober import EUCJPProber
+from .gb2312prober import GB2312Prober
+from .euckrprober import EUCKRProber
+from .big5prober import Big5Prober
+from .euctwprober import EUCTWProber
 
 class MBCSGroupProber(CharSetGroupProber):
     def __init__(self):

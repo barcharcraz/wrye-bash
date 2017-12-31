@@ -35,7 +35,7 @@
 
 
 # Imports ---------------------------------------------------------------------
-from __future__ import print_function
+
 
 import glob
 import subprocess
@@ -66,7 +66,7 @@ except ImportError:
 # environment detection
 try:
     #--Needed for the Installer version to find NSIS
-    import _winreg
+    import winreg
 except ImportError:
     _winreg = False
 
@@ -85,22 +85,22 @@ except:
 
 
 # ensure we are in the correct directory so relative paths will work properly
-scriptDir = os.path.dirname(unicode(sys.argv[0], sys.getfilesystemencoding()))
+scriptDir = os.path.dirname(str(sys.argv[0], sys.getfilesystemencoding()))
 if scriptDir:
     os.chdir(scriptDir)
-os.chdir(u'..')
+os.chdir('..')
 
 
 # Setup some global paths that all functions will use
-root = os.getcwdu()
-scripts = os.path.join(root, u'scripts')
-mopy = os.path.join(root, u'Mopy')
-apps = os.path.join(mopy, u'Apps')
+root = os.getcwd()
+scripts = os.path.join(root, 'scripts')
+mopy = os.path.join(root, 'Mopy')
+apps = os.path.join(mopy, 'Apps')
 if sys.platform.lower().startswith('linux'):
-    exe7z = u'7z'
+    exe7z = '7z'
 else:
-    exe7z = os.path.join(mopy, u'bash', u'compiled', u'7z.exe')
-dest = os.path.join(scripts, u'dist')
+    exe7z = os.path.join(mopy, 'bash', 'compiled', '7z.exe')
+dest = os.path.join(scripts, 'dist')
 
 # global pipe file for log output
 pipe = None
@@ -113,9 +113,9 @@ def GetVersionInfo(version, padding=4):
        For example, a
        version of 291 would with default padding would return:
        ('291','0.2.9.1')"""
-    v = version.split(u'.')
+    v = version.split('.')
     if len(v) == 2:
-        if len(v[1]) == 12 and float(v[1]) >= 201603171733L: # 2016/03/17 17:33
+        if len(v[1]) == 12 and float(v[1]) >= 201603171733: # 2016/03/17 17:33
             v, v1 = v[:1], v[1]
             v.extend((v1[:4], v1[4:8], v1[8:]))
     # If version is too short, pad it with 0's
@@ -143,11 +143,11 @@ def GetVersionInfo(version, padding=4):
             newv.append(x)
         except ValueError:
             error = True
-            newv.append(u'0')
+            newv.append('0')
     if error:
         lprint('WARNING: The version specified ({version}) does not convert '
                'to integer values.'.format(version=version))
-    file_version = u'.'.join(newv)
+    file_version = '.'.join(newv)
     lprint('Using file version:', file_version)
     return file_version
 
@@ -193,16 +193,16 @@ def VerifyPy2Exe():
        the modified version, and need the original."""
     # CRCs of the correct version, from both 'r', and 'rb' mode
     crcGood = [0xA56E66A6, 0x57925DA8]
-    path = os.path.join(sys.prefix, u'Lib', u'site-packages',
-                        u'zipextimporter.py')
+    path = os.path.join(sys.prefix, 'Lib', 'site-packages',
+                        'zipextimporter.py')
     # First we'll test using 'r' mode, this way if the line endings differ,
     # but the contents are the same, the crc will still be equal
-    with open(os.path.join(scripts, u'zipextimporter.py'), 'r') as ins:
+    with open(os.path.join(scripts, 'zipextimporter.py'), 'r') as ins:
         crcBad = binascii.crc32(ins.read())
-    crcBad &= 0xFFFFFFFFL
+    crcBad &= 0xFFFFFFFF
     with open(path, 'r') as ins:
         crcTest = binascii.crc32(ins.read())
-    crcTest &= 0xFFFFFFFFL
+    crcTest &= 0xFFFFFFFF
     if crcTest == crcBad:
         # Definitely using the old modified version, need to reinstall
         return False
@@ -213,7 +213,7 @@ def VerifyPy2Exe():
     # crc.
     with open(path, 'rb') as ins:
         crcTest = binascii.crc32(ins.read())
-    crcTest &= 0xFFFFFFFFL
+    crcTest &= 0xFFFFFFFF
     if crcTest in crcGood:
         # Definitely using the un-modified version
         return True
@@ -225,15 +225,15 @@ def VerifyPy2Exe():
 def PackManualVersion(args, all_files):
     """Creates the standard python manual install version"""
     version = args.version
-    archive = os.path.join(dest, u'Wrye Bash %s - Python Source.7z' % version)
-    listFile = os.path.join(dest, u'manual_list.txt')
+    archive = os.path.join(dest, 'Wrye Bash %s - Python Source.7z' % version)
+    listFile = os.path.join(dest, 'manual_list.txt')
     # We want every file for the manual version
     _pack7z(all_files, archive, listFile)
 
 
 def _pack7z(all_files, archive, listFile):
     with open(listFile, 'wb') as out:
-        for node in sorted(all_files, key=unicode.lower):
+        for node in sorted(all_files, key=str.lower):
             out.write(node)
             out.write('\n')
     cmd_7z = [exe7z, 'a', '-mx9', archive, '@%s' % listFile]
@@ -243,7 +243,7 @@ def _pack7z(all_files, archive, listFile):
 
 def CleanupStandaloneFiles():
     """Removes standalone exe files that are not needed after packaging"""
-    rm(os.path.join(mopy, u'Wrye Bash.exe'))
+    rm(os.path.join(mopy, 'Wrye Bash.exe'))
 
 
 def CreateStandaloneExe(args, file_version):
@@ -259,21 +259,21 @@ def CreateStandaloneExe(args, file_version):
                " get the original file back.")
         return False
     # Some paths we'll use
-    wbsa = os.path.join(scripts, u'build', u'standalone')
-    reshacker = os.path.join(wbsa, u'Reshacker.exe')
-    upx = os.path.join(wbsa, u'upx.exe')
-    icon = os.path.join(wbsa, u'bash.ico')
-    manifest = os.path.join(wbsa, u'manifest.template')
-    script = os.path.join(wbsa, u'setup.template')
-    exe = os.path.join(mopy, u'Wrye Bash.exe')
-    setup = os.path.join(mopy, u'setup.py')
+    wbsa = os.path.join(scripts, 'build', 'standalone')
+    reshacker = os.path.join(wbsa, 'Reshacker.exe')
+    upx = os.path.join(wbsa, 'upx.exe')
+    icon = os.path.join(wbsa, 'bash.ico')
+    manifest = os.path.join(wbsa, 'manifest.template')
+    script = os.path.join(wbsa, 'setup.template')
+    exe = os.path.join(mopy, 'Wrye Bash.exe')
+    setup = os.path.join(mopy, 'setup.py')
     #--For l10n
-    msgfmt = os.path.join(sys.prefix, u'Tools', u'i18n', u'msgfmt.py')
-    pygettext = os.path.join(sys.prefix, u'Tools', u'i18n', u'pygettext.py')
-    msgfmtTo = os.path.join(mopy, u'bash', u'msgfmt.py')
-    pygettextTo = os.path.join(mopy, u'bash', u'pygettext.py')
+    msgfmt = os.path.join(sys.prefix, 'Tools', 'i18n', 'msgfmt.py')
+    pygettext = os.path.join(sys.prefix, 'Tools', 'i18n', 'pygettext.py')
+    msgfmtTo = os.path.join(mopy, 'bash', 'msgfmt.py')
+    pygettextTo = os.path.join(mopy, 'bash', 'pygettext.py')
     #--Output folders/files
-    dist = os.path.join(mopy, u'dist')
+    dist = os.path.join(mopy, 'dist')
 
     if not os.path.isfile(script):
         lprint(" Could not find 'setup.template', aborting standalone "
@@ -324,7 +324,7 @@ def CreateStandaloneExe(args, file_version):
         os.chdir(root)
 
         # Copy the exe's to the Mopy folder
-        mv(os.path.join(dist, u'Wrye Bash Launcher.exe'), exe)
+        mv(os.path.join(dist, 'Wrye Bash Launcher.exe'), exe)
 
         # Insert the icon
         lprint(' Adding icon...')
@@ -334,7 +334,7 @@ def CreateStandaloneExe(args, file_version):
         # Also copy contents of ResHacker.log to the pipe file
         if pipe is not None:
             try:
-                with open(os.path.join(wbsa, u'Reshacker.log'), 'r') as ins:
+                with open(os.path.join(wbsa, 'Reshacker.log'), 'r') as ins:
                     for line in ins:
                         print(line, file=pipe)
             except:
@@ -353,11 +353,11 @@ def CreateStandaloneExe(args, file_version):
         rm(msgfmtTo)
         rm(pygettextTo)
         rm(dist)
-        rm(os.path.join(mopy, u'build'))
-        rm(os.path.join(wbsa, u'ResHacker.ini'))
-        rm(os.path.join(wbsa, u'ResHacker.log'))
+        rm(os.path.join(mopy, 'build'))
+        rm(os.path.join(wbsa, 'ResHacker.ini'))
+        rm(os.path.join(wbsa, 'ResHacker.log'))
         rm(setup)
-        rm(os.path.join(mopy, u'Wrye Bash.upx'))
+        rm(os.path.join(mopy, 'Wrye Bash.upx'))
 
     return True
 
@@ -367,25 +367,25 @@ def PackStandaloneVersion(args, all_files):
     version = args.version
     archive = os.path.join(
                   dest,
-                  u'Wrye Bash %s - Standalone Executable.7z' % version
+                  'Wrye Bash %s - Standalone Executable.7z' % version
                   )
     # We do not want any python files with the standalone
     # version, and we need to include the built EXEs
     all_files = [x for x in all_files
-                 if os.path.splitext(x)[1].lower() not in (u'.py',
-                                                           u'.pyw',
-                                                           u'.pyd',
-                                                           u'.bat',
-                                                           u'.template')
+                 if os.path.splitext(x)[1].lower() not in ('.py',
+                                                           '.pyw',
+                                                           '.pyd',
+                                                           '.bat',
+                                                           '.template')
                  ]
-    all_files.append(u'Mopy\\Wrye Bash.exe')
-    listFile = os.path.join(dest, u'standalone_list.txt')
+    all_files.append('Mopy\\Wrye Bash.exe')
+    listFile = os.path.join(dest, 'standalone_list.txt')
     _pack7z(all_files, archive, listFile)
 
 
 def RelocateNonRepoFiles(non_repo):
     """Moves any non-repository files/directories to scripts/temp"""
-    tmpDir = os.path.join(u'scripts', u'temp')
+    tmpDir = os.path.join('scripts', 'temp')
     rm(tmpDir)
     os.makedirs(tmpDir)
 
@@ -426,7 +426,7 @@ def WarnNonRepoFiles(args, all_files):
 
 def RestoreNonRepoFiles():
     """Returns non-repository files scripts/temp to their proper locations"""
-    tmpDir = os.path.join(u'scripts', u'temp')
+    tmpDir = os.path.join('scripts', 'temp')
     if not os.path.exists(tmpDir):
         return
     failed = []
@@ -462,10 +462,10 @@ def RestoreNonRepoFiles():
 def MakeTempRepoCopy(all_files):
     """Create a temporary copy of the necessary repository files to
        have a clean repository for building."""
-    temp_root = os.path.join(scripts, u'build_temp')
-    temp_scripts = os.path.join(temp_root, u'scripts')
-    temp_nsis = os.path.join(temp_scripts, u'build', u'installer')
-    nsis = os.path.join(scripts, u'build', u'installer')
+    temp_root = os.path.join(scripts, 'build_temp')
+    temp_scripts = os.path.join(temp_root, 'scripts')
+    temp_nsis = os.path.join(temp_scripts, 'build', 'installer')
+    nsis = os.path.join(scripts, 'build', 'installer')
     lprint(" Copying repository files to temporary location...")
     # Clean the destination
     if os.path.exists(temp_root):
@@ -474,7 +474,7 @@ def MakeTempRepoCopy(all_files):
     # Copy the NSIS scripts to the correct location
     shutil.copytree(nsis, temp_nsis)
     # Copy the repository files + WBSA files
-    wbsa_files = [u'Mopy\\Wrye Bash.exe']
+    wbsa_files = ['Mopy\\Wrye Bash.exe']
     for fname in all_files + wbsa_files:
         dst = os.path.join(temp_root, fname)
         src = os.path.join(root, fname)
@@ -484,7 +484,7 @@ def MakeTempRepoCopy(all_files):
 
 def RemoveTempRepoCopy():
     """Deletes the temporary repository copy if present."""
-    temp_root = os.path.join(scripts, u'build_temp')
+    temp_root = os.path.join(scripts, 'build_temp')
     if os.path.exists(temp_root):
         shutil.rmtree(temp_root)
 
@@ -497,7 +497,7 @@ def BuildInstallerVersion(args, all_files, file_version):
                "creation.")
         return
 
-    rel_script = os.path.join(u'build', u'installer', u'main.nsi')
+    rel_script = os.path.join('build', 'installer', 'main.nsi')
     script = os.path.join(scripts, rel_script)
     if not os.path.exists(script):
         lprint(" Could not find nsis script '%s', aborting installer "
@@ -508,10 +508,10 @@ def BuildInstallerVersion(args, all_files, file_version):
         if nsis is None:
             # Need NSIS version 3.0+, so we can use the Inetc plugin
             # Older versions of NSIS 2.x key was located here:
-            nsis = _winreg.QueryValue(_winreg.HKEY_LOCAL_MACHINE,
+            nsis = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE,
                                       r'Software\NSIS')
-        inetc = os.path.join(nsis, u'Plugins', u'x86-unicode', u'inetc.dll')
-        nsis = os.path.join(nsis, u'makensis.exe')
+        inetc = os.path.join(nsis, 'Plugins', 'x86-unicode', 'inetc.dll')
+        nsis = os.path.join(nsis, 'makensis.exe')
         if not os.path.isfile(nsis):
             lprint(" Could not find 'makensis.exe', aborting installer "
                    "creation.")
@@ -529,8 +529,8 @@ def BuildInstallerVersion(args, all_files, file_version):
                     RelocateNonRepoFiles(non_repo)
                 elif args.non_repo == NON_REPO.COPY:
                     temp_root = MakeTempRepoCopy(all_files)
-                    script = os.path.join(temp_root, u'scripts', rel_script)
-                    clean_mopy_dir = os.path.join(temp_root, u'Mopy')
+                    script = os.path.join(temp_root, 'scripts', rel_script)
+                    clean_mopy_dir = os.path.join(temp_root, 'Mopy')
             clean_mopy_dir = os.path.relpath(clean_mopy_dir, os.getcwd())
 
             # Build the installer
@@ -630,27 +630,27 @@ def GetGitFiles(gitDir, version):
     try:
         if sys.platform == 'win32':
             # Windows, check all the PATH options first
-            for path in os.environ['PATH'].split(u';'):
-                if os.path.isfile(os.path.join(path, u'git.exe')):
+            for path in os.environ['PATH'].split(';'):
+                if os.path.isfile(os.path.join(path, 'git.exe')):
                     # Found, no changes necessary
                     break
             else:
                 # Not found in PATH, try user supplied directory, as well as
                 # common install paths
-                pfiles = os.path.join(os.path.expandvars(u'%PROGRAMFILES%'),
-                                      u'Git', u'bin')
-                if u'(x86)' in pfiles:
+                pfiles = os.path.join(os.path.expandvars('%PROGRAMFILES%'),
+                                      'Git', 'bin')
+                if '(x86)' in pfiles:
                     # On a 64-bit system, running 32-bit Python, there is
                     # no environment variable that expands to the 64-bit
                     # program files location, so do a hacky workaround
-                    pfilesx64 = pfiles.replace(u'Program Files (x86)',
-                                               u'Program Files')
+                    pfilesx64 = pfiles.replace('Program Files (x86)',
+                                               'Program Files')
                 else:
                     pfilesx64 = None
                 for path in (gitDir, pfiles, pfilesx64):
                     if path is None:
                         continue
-                    if os.path.isfile(os.path.join(path, u'git.exe')):
+                    if os.path.isfile(os.path.join(path, 'git.exe')):
                         # Found it, put the path into PATH
                         os.environ['PATH'] += ';' + path
                         break
@@ -677,14 +677,14 @@ def GetGitFiles(gitDir, version):
                    % (branchName, version))
         else:
             lprint('Building from branch "%s".' % branchName)
-        files = [unicode(os.path.normpath(x.path))
+        files = [str(os.path.normpath(x.path))
                  for x in repo.tree().traverse()
-                 if x.path.lower().startswith(u'mopy')
+                 if x.path.lower().startswith('mopy')
                     and os.path.isfile(x.path)
                  ]
         # Special case: we want the Apps folder to be included, even though
         # it's not in the repository
-        files.append(os.path.join(u'Mopy', u'Apps'))
+        files.append(os.path.join('Mopy', 'Apps'))
         return files
     except:
         lprint('An error occurred while attempting to interface with '
@@ -702,16 +702,16 @@ def GetNonRepoFiles(repo_files):
     # Get a list of every directory and file actually present
     mopy_files = []
     mopy_dirs = []
-    for root, dirs, files in _walkdir(u'Mopy'):
+    for root, dirs, files in _walkdir('Mopy'):
         mopy_files.extend((os.path.join(root, x) for x in files))
         mopy_dirs.extend((os.path.join(root, x) for x in dirs))
     mopy_files = (os.path.normpath(x) for x in mopy_files)
     # We can ignore .pyc and .pyo files, since the NSIS scripts skip those
     mopy_files = (x for x in mopy_files
-                 if os.path.splitext(x)[1].lower() not in (u'.pyc', u'.pyo'))
+                 if os.path.splitext(x)[1].lower() not in ('.pyc', '.pyo'))
     # We can also ignore Wrye Bash.exe, for the same reason
     mopy_files = (x for x in mopy_files
-                 if os.path.basename(x).lower() != u'wrye bash.exe')
+                 if os.path.basename(x).lower() != 'wrye bash.exe')
     mopy_dirs = (os.path.normpath(x) for x in mopy_dirs)
     # Pick out every file that doesn't belong
     non_repo.extend((x for x in mopy_files if x not in set(repo_files)))
@@ -728,7 +728,7 @@ def GetNonRepoFiles(repo_files):
             # relocating
             non_repo_dirs.append(mopy_dir)
     if non_repo_dirs:
-        non_repo_dirs.sort(key=unicode.lower)
+        non_repo_dirs.sort(key=str.lower)
         parent_dir = non_repo_dirs[0][5:]
         parent_dirs, parent_dir = [parent_dir], parent_dir.lower()
         for skip_dir in non_repo_dirs[1:]:
@@ -876,7 +876,7 @@ def main():
         return
     if not args.version:
         print('No release version specified, please enter it now.')
-        args.version = raw_input('>')
+        args.version = input('>')
 
     print (sys.version)
 
@@ -903,7 +903,7 @@ def main():
 
         # Create the Mopy/Apps folder if it's not present
         if appsPresent:
-            apps_temp = os.path.join(scripts, u'apps_temp')
+            apps_temp = os.path.join(scripts, 'apps_temp')
             rm(apps_temp)
             os.makedirs(apps_temp)
             lprint('Moving your Apps folder to %s' % apps_temp)
@@ -917,8 +917,8 @@ def main():
             return
 
         # Add the LOOT API binaries to all_files
-        all_files.append(os.path.join(u'Mopy', u'loot_api.dll'))
-        all_files.append(os.path.join(u'Mopy', u'loot_api.pyd'))
+        all_files.append(os.path.join('Mopy', 'loot_api.dll'))
+        all_files.append(os.path.join('Mopy', 'loot_api.pyd'))
 
         file_version = GetVersionInfo(args.version)
 
@@ -965,9 +965,9 @@ def main():
     finally:
         # Clean up Mopy/Apps if it was not present to begin with
         if appsPresent:
-            backapps = os.path.join(apps_temp, u'Apps')
-            for lnk in glob.glob(backapps + os.sep + u'*'):
-                shutil.copy(lnk, os.path.join(mopy, u'Apps'))
+            backapps = os.path.join(apps_temp, 'Apps')
+            for lnk in glob.glob(backapps + os.sep + '*'):
+                shutil.copy(lnk, os.path.join(mopy, 'Apps'))
             # shutil.move(backapps, mopy)
             rm(apps_temp)
         else: rm(apps)

@@ -30,12 +30,12 @@
 import collections
 import os
 import re
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import subprocess
 
 #-- To make commands executed with Popen hidden
 startupinfo = None
-if os.name == u'nt':
+if os.name == 'nt':
     startupinfo = subprocess.STARTUPINFO()
     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
@@ -44,14 +44,14 @@ class Nexus:
     # http://www.nexusmods.com/skyrim/mods/25859/?tab=2&navtag=http%3A%2F%2Fwww.nexusmods.com%2Fskyrim%2Fajax%2Fmodfiles%2F%3Fid%3D25859&pUp=1
     # http://www.nexusmods.com/oblivion/mods/22368/?tab=2&navtag=http%3A%2F%2Fwww.nexusmods.com%2Foblivion%2Fajax%2Fmodfiles%2F%3Fid%3D22368&pUp=1
     reFileGroupStart = re.compile(
-        u'.*?<h3>\s*(.+?)\s*</h3>\s*<ol\s+class\s*=\s*"files-tab-files-list"\s*>(.*)',
+        '.*?<h3>\s*(.+?)\s*</h3>\s*<ol\s+class\s*=\s*"files-tab-files-list"\s*>(.*)',
         re.I|re.U)
-    reFileStart = re.compile(u'.*?<li>(.*)', re.I|re.U)
-    reFileEnd = re.compile(u'.*?</li>(.*)', re.I|re.U)
+    reFileStart = re.compile('.*?<li>(.*)', re.I|re.U)
+    reFileEnd = re.compile('.*?</li>(.*)', re.I|re.U)
     reFileName = re.compile(
-        u'.*?<span\s+class\s*=\s*"name"\s*>\s*<\s*a\s+href\s*=\"(.*?)\".*?>(.+?)</a></span>(.*)', re.I|re.U)
+        '.*?<span\s+class\s*=\s*"name"\s*>\s*<\s*a\s+href\s*=\"(.*?)\".*?>(.+?)</a></span>(.*)', re.I|re.U)
     reFileVersion = re.compile(
-        u'.*?<span\s+class\s*=\s*"version"\s*>\|\s*version\s+(.+?)\s*</span>(.*)',
+        '.*?<span\s+class\s*=\s*"version"\s*>\|\s*version\s+(.+?)\s*</span>(.*)',
         re.I|re.U)
 
     # Class for interacting with TES/Skyrim Nexus
@@ -91,7 +91,7 @@ class Nexus:
         currentVersion = None
         currentUrl = None
 
-        url = urllib2.urlopen(urlFiles)
+        url = urllib.request.urlopen(urlFiles)
         for line in url:
             maFileGroupStart = reFileGroupStart.match(line)
             if maFileGroupStart:
@@ -120,7 +120,7 @@ class Nexus:
                 currentVersion = maFileVersion.group(1)
                 line = maFileVersion.group(2)
                 try:
-                    currentVersion = tuple([int(x) for x in currentVersion.split(u'.')])
+                    currentVersion = tuple([int(x) for x in currentVersion.split('.')])
                 except:
                     currentVersion = None
             maFileEnd = reFileEnd.match(line)

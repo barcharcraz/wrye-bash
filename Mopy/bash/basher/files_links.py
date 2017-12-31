@@ -41,7 +41,7 @@ class Files_SortBy(RadioLink):
         super(Files_SortBy, self).__init__()
         self.sortCol = sortCol
         self._text = bass.settings['bash.colNames'][sortCol]
-        self.help = _(u'Sort by %s') % self._text
+        self.help = _('Sort by %s') % self._text
 
     def _check(self): return self.window.sort_column == self.sortCol
 
@@ -49,11 +49,11 @@ class Files_SortBy(RadioLink):
 
 class Files_Unhide(ItemLink):
     """Unhide file(s). (Move files back to Data Files or Save directory.)"""
-    _text = _(u"Unhide...")
+    _text = _("Unhide...")
 
     def __init__(self, files_type):
         super(Files_Unhide, self).__init__()
-        self.help = _(u"Unhides hidden %ss.") % files_type
+        self.help = _("Unhides hidden %ss.") % files_type
 
     @balt.conversation
     def Execute(self):
@@ -68,13 +68,13 @@ class Files_Unhide(ItemLink):
             (newSrcDir,srcFileName) = srcPath.headTail
             if newSrcDir == destDir:
                 self._showError(
-                    _(u"You can't unhide files from this directory."))
+                    _("You can't unhide files from this directory."))
                 return
             #--File already unhidden?
             destPath = destDir.join(srcFileName)
-            if destPath.exists() or (destPath + u'.ghost').exists():
-                self._showWarning(_(u"File skipped: %s. File is already "
-                                    u"present.") % (srcFileName.s,))
+            if destPath.exists() or (destPath + '.ghost').exists():
+                self._showWarning(_("File skipped: %s. File is already "
+                                    "present.") % (srcFileName.s,))
             #--Move it?
             else:
                 srcFiles.append(srcPath)
@@ -97,24 +97,24 @@ class File_Duplicate(ItemLink):
 
     def _initData(self, window, selection):
         super(File_Duplicate, self)._initData(window, selection)
-        self._text = (_(u'Duplicate'), _(u'Duplicate...'))[len(selection) == 1]
-        self.help = _(u"Make a copy of '%s'") % (selection[0])
+        self._text = (_('Duplicate'), _('Duplicate...'))[len(selection) == 1]
+        self.help = _("Make a copy of '%s'") % (selection[0])
 
-    _bsaAndVoice = _(u"This mod has an associated archive (%s." +
-                    bush.game.bsa_extension + u") and an "
-        u"associated voice directory (Sound\\Voices\\%s), which will not be "
-        u"attached to the duplicate mod.") + u'\n\n' + _(u'Note that the BSA '
-        u'archive may also contain a voice directory (Sound\\Voices\\%s), '
-        u'which would remain detached even if a duplicate archive were also '
-        u'created.')
-    _bsa = _(u'This mod has an associated archive (%s.' +
-                    bush.game.bsa_extension + u'), which will not be '
-        u'attached to the duplicate mod.') + u'\n\n' + _(u'Note that this BSA '
-        u'archive may contain a voice directory (Sound\\Voices\\%s), which '
-        u'would remain detached even if a duplicate archive were also created.'
+    _bsaAndVoice = _("This mod has an associated archive (%s." +
+                    bush.game.bsa_extension + ") and an "
+        "associated voice directory (Sound\\Voices\\%s), which will not be "
+        "attached to the duplicate mod.") + '\n\n' + _('Note that the BSA '
+        'archive may also contain a voice directory (Sound\\Voices\\%s), '
+        'which would remain detached even if a duplicate archive were also '
+        'created.')
+    _bsa = _('This mod has an associated archive (%s.' +
+                    bush.game.bsa_extension + '), which will not be '
+        'attached to the duplicate mod.') + '\n\n' + _('Note that this BSA '
+        'archive may contain a voice directory (Sound\\Voices\\%s), which '
+        'would remain detached even if a duplicate archive were also created.'
     )
-    _voice = _(ur'This mod has an associated voice directory (Sound\Voice\%s),'
-        u' which will not be attached to the duplicate mod.')
+    _voice = _(r'This mod has an associated voice directory (Sound\Voice\%s),'
+        ' which will not be attached to the duplicate mod.')
 
     def _askResourcesOk(self, fileInfo):
         msg = bosh.modInfos.askResourcesOk(fileInfo,
@@ -122,7 +122,7 @@ class File_Duplicate(ItemLink):
                                            bsa=self._bsa, voice=self._voice)
         if not msg: return True  # resources ok
         return balt.askWarning(self.window, msg,
-                               _(u'Duplicate ') + fileInfo.name.s)
+                               _('Duplicate ') + fileInfo.name.s)
 
     @balt.conversation
     def Execute(self):
@@ -134,19 +134,19 @@ class File_Duplicate(ItemLink):
             #--Continue copy
             if bosh.saveInfos.bak_file_pattern.match(to_duplicate.s):
                 continue #YAK!
-            (destDir, wildcard) = (fileInfo.dir, u'*' + to_duplicate.ext)
+            (destDir, wildcard) = (fileInfo.dir, '*' + to_duplicate.ext)
             destName = self.window.new_path(
-                GPath(to_duplicate.root + u' Copy' + to_duplicate.ext), destDir)
+                GPath(to_duplicate.root + ' Copy' + to_duplicate.ext), destDir)
             destDir.makedirs()
             if len(self.selected) == 1:
                 destPath = self._askSave(
-                    title=_(u'Duplicate as:'), defaultDir=destDir,
+                    title=_('Duplicate as:'), defaultDir=destDir,
                     defaultFile=destName.s, wildcard=wildcard)
                 if not destPath: return
                 destDir, destName = destPath.headTail
             if (destDir == fileInfo.dir) and (destName == to_duplicate):
                 self._showError(
-                    _(u"Files cannot be duplicated to themselves!"))
+                    _("Files cannot be duplicated to themselves!"))
                 continue
             fileInfos.copy_info(to_duplicate, destDir, destName)
             if fileInfo.isMod(): ##: move this inside copy_info
@@ -161,12 +161,12 @@ class File_Duplicate(ItemLink):
 
 class File_ListMasters(OneItemLink):
     """Copies list of masters to clipboard."""
-    _text = _(u"List Masters...")
+    _text = _("List Masters...")
 
     def _initData(self, window, selection):
         super(File_ListMasters, self)._initData(window, selection)
         self.help = _(
-            u"Copies list of %(filename)s's masters to the clipboard.") % (
+            "Copies list of %(filename)s's masters to the clipboard.") % (
                         {'filename': selection[0]})
 
     def Execute(self):
@@ -177,11 +177,11 @@ class File_ListMasters(OneItemLink):
 
 class File_Snapshot(ItemLink):
     """Take a snapshot of the file."""
-    help = _(u"Creates a snapshot copy of the current mod in a subdirectory (Bash\Snapshots).")
+    help = _("Creates a snapshot copy of the current mod in a subdirectory (Bash\Snapshots).")
 
     def _initData(self, window, selection):
         super(File_Snapshot, self)._initData(window, selection)
-        self._text = (_(u'Snapshot'),_(u'Snapshot...'))[len(selection) == 1]
+        self._text = (_('Snapshot'),_('Snapshot...'))[len(selection) == 1]
 
     def Execute(self):
         for fileName, fileInfo in self.iselected_pairs():
@@ -189,7 +189,7 @@ class File_Snapshot(ItemLink):
             destDir.makedirs()
             if len(self.selected) == 1:
                 destPath = self._askSave(
-                    title=_(u'Save snapshot as:'), defaultDir=destDir,
+                    title=_('Save snapshot as:'), defaultDir=destDir,
                     defaultFile=destName, wildcard=wildcard)
                 if not destPath: return
                 (destDir,destName) = destPath.headTail
@@ -197,9 +197,9 @@ class File_Snapshot(ItemLink):
             fileRoot = fileName.root
             destRoot = destName.root
             fileVersion = bolt.getMatch(
-                re.search(ur'[ _]+v?([.\d]+)$', fileRoot.s, re.U), 1)
+                re.search(r'[ _]+v?([.\d]+)$', fileRoot.s, re.U), 1)
             snapVersion = bolt.getMatch(
-                re.search(ur'-[\d.]+$', destRoot.s, re.U))
+                re.search(r'-[\d.]+$', destRoot.s, re.U))
             fileHedr = fileInfo.header
             if fileInfo.isMod() and (fileVersion or snapVersion) and bosh.reVersion.search(fileHedr.description):
                 if fileVersion and snapVersion:
@@ -208,7 +208,7 @@ class File_Snapshot(ItemLink):
                     newVersion = snapVersion[1:]
                 else:
                     newVersion = fileVersion
-                newDescription = bosh.reVersion.sub(u'\\1 '+newVersion, fileHedr.description,1)
+                newDescription = bosh.reVersion.sub('\\1 '+newVersion, fileHedr.description,1)
                 fileInfo.writeDescription(newDescription)
                 self.window.panel.SetDetails(fileName)
             #--Copy file
@@ -216,8 +216,8 @@ class File_Snapshot(ItemLink):
 
 class File_RevertToSnapshot(OneItemLink): # MODS LINK !
     """Revert to Snapshot."""
-    _text = _(u'Revert to Snapshot...')
-    help = _(u"Revert to a previously created snapshot from the Bash/Snapshots dir.")
+    _text = _('Revert to Snapshot...')
+    help = _("Revert to a previously created snapshot from the Bash/Snapshots dir.")
 
     @balt.conversation
     def Execute(self):
@@ -228,15 +228,15 @@ class File_RevertToSnapshot(OneItemLink): # MODS LINK !
         wildcard = self._selected_info.getNextSnapshot()[2]
         #--File dialog
         srcDir.makedirs()
-        snapPath = self._askOpen(_(u'Revert %s to snapshot:') % fileName.s,
+        snapPath = self._askOpen(_('Revert %s to snapshot:') % fileName.s,
                                  defaultDir=srcDir, wildcard=wildcard,
                                  mustExist=True)
         if not snapPath: return
         snapName = snapPath.tail
         #--Warning box
-        message = (_(u"Revert %s to snapshot %s dated %s?") % (
+        message = (_("Revert %s to snapshot %s dated %s?") % (
             fileName.s, snapName.s, formatDate(snapPath.mtime)))
-        if not self._askYes(message, _(u'Revert to Snapshot')): return
+        if not self._askYes(message, _('Revert to Snapshot')): return
         with balt.BusyCursor():
             destPath = self._selected_info.getPath()
             current_mtime = destPath.mtime
@@ -246,15 +246,15 @@ class File_RevertToSnapshot(OneItemLink): # MODS LINK !
             try:
                 self.window.data_store.new_info(fileName, notify_bain=True)
             except exception.FileError: # FIXME(ut) - we just lost the correct file
-                balt.showError(self,_(u'Snapshot file is corrupt!'))
+                balt.showError(self,_('Snapshot file is corrupt!'))
                 self.window.panel.ClearDetails()
         # don't refresh saves as neither selection state nor load order change
         self.window.RefreshUI(redraw=[fileName], refreshSaves=False)
 
 class File_Backup(ItemLink):
     """Backup file."""
-    _text = _(u'Backup')
-    help = _(u"Create a backup of the selected file(s).")
+    _text = _('Backup')
+    help = _("Create a backup of the selected file(s).")
 
     def Execute(self):
         for fileInfo in self.iselected_infos():
@@ -264,16 +264,16 @@ class _RevertBackup(OneItemLink):
 
     def __init__(self, first=False):
         super(_RevertBackup, self).__init__()
-        self._text = _(u'Revert to First Backup') if first else _(
-            u'Revert to Backup')
+        self._text = _('Revert to First Backup') if first else _(
+            'Revert to Backup')
         self.first = first
 
     def _initData(self, window, selection):
         super(_RevertBackup, self)._initData(window, selection)
         self.backup_path = self._selected_info.backup_dir.join(
-            self._selected_item) + (u'f' if self.first else u'')
-        self.help = _(u"Revert %(file)s to its first backup") if self.first \
-            else _(u"Revert %(file)s to its last backup")
+            self._selected_item) + ('f' if self.first else '')
+        self.help = _("Revert %(file)s to its first backup") if self.first \
+            else _("Revert %(file)s to its last backup")
         self.help %= {'file': self._selected_item}
 
     def _enable(self):
@@ -283,7 +283,7 @@ class _RevertBackup(OneItemLink):
     @balt.conversation
     def Execute(self):
         #--Warning box
-        message = _(u"Revert %s to backup dated %s?") % (
+        message = _("Revert %s to backup dated %s?") % (
             self._selected_item.s, formatDate(self.backup_path.mtime))
         if not self._askYes(message): return
         with balt.BusyCursor():
@@ -292,7 +292,7 @@ class _RevertBackup(OneItemLink):
                 self.window.RefreshUI(redraw=[self._selected_item],
                                       refreshSaves=False)
             except exception.FileError:
-                self._showError(_(u'Old file is corrupt!'))
+                self._showError(_('Old file is corrupt!'))
                 self.window.RefreshUI(refreshSaves=True)
 
 class File_RevertToBackup(ChoiceLink):

@@ -44,21 +44,21 @@ __all__ = ['AlchemicalCatalogs', 'CBash_AlchemicalCatalogs', 'CoblExhaustion',
 # Util Functions --------------------------------------------------------------
 def _PrintFormID(fid):
     # PBash short Fid
-    if isinstance(fid,(long,int)):
-        fid = u'%08X' % fid
+    if isinstance(fid,int):
+        fid = '%08X' % fid
     # PBash long FId
     elif isinstance(fid, tuple):
-        fid =  u'(%s, %06X)' % (fid[0], fid[1])
+        fid =  '(%s, %06X)' % (fid[0], fid[1])
     # CBash / other(error)
     else:
         fid = repr(fid)
-    print fid.encode('utf-8')
+    print(fid.encode('utf-8'))
 
 class _AAlchemicalCatalogs(SpecialPatcher):
     """Updates COBL alchemical catalogs."""
-    name = _(u'Cobl Catalogs')
-    text = (_(u"Update COBL's catalogs of alchemical ingredients and effects.")
-            + u'\n\n' + _(u'Will only run if Cobl Main.esm is loaded.'))
+    name = _('Cobl Catalogs')
+    text = (_("Update COBL's catalogs of alchemical ingredients and effects.")
+            + '\n\n' + _('Will only run if Cobl Main.esm is loaded.'))
     # CONFIG DEFAULTS
     default_isEnabled = True
 
@@ -67,7 +67,7 @@ class AlchemicalCatalogs(_AAlchemicalCatalogs,Patcher):
     #--Patch Phase ------------------------------------------------------------
     def initPatchFile(self,patchFile,loadMods):
         super(AlchemicalCatalogs, self).initPatchFile(patchFile, loadMods)
-        self.isActive = (GPath(u'COBL Main.esm') in loadMods)
+        self.isActive = (GPath('COBL Main.esm') in loadMods)
         self.id_ingred = {}
 
     def getReadClasses(self):
@@ -97,7 +97,7 @@ class AlchemicalCatalogs(_AAlchemicalCatalogs,Patcher):
         #--Setup
         mgef_name = self.patchFile.getMgefName()
         for mgef in mgef_name:
-            mgef_name[mgef] = re.sub(_(u'(Attribute|Skill)'), u'',
+            mgef_name[mgef] = re.sub(_('(Attribute|Skill)'), '',
                                      mgef_name[mgef])
         actorEffects = bush.genericAVEffects
         actorNames = bush.actorValues
@@ -112,9 +112,9 @@ class AlchemicalCatalogs(_AAlchemicalCatalogs,Patcher):
             book.full = full
             book.value = value
             book.weight = 0.2
-            book.fid = keep((GPath(u'Cobl Main.esm'),objectId))
-            book.text = u'<div align="left"><font face=3 color=4444>'
-            book.text += _(u"Salan's Catalog of ")+u'%s\r\n\r\n' % full
+            book.fid = keep((GPath('Cobl Main.esm'),objectId))
+            book.text = '<div align="left"><font face=3 color=4444>'
+            book.text += _("Salan's Catalog of ")+'%s\r\n\r\n' % full
             book.iconPath = iconPath
             book.model = book.getDefault('model')
             book.model.modPath = modelPath
@@ -124,36 +124,36 @@ class AlchemicalCatalogs(_AAlchemicalCatalogs,Patcher):
             return book
         #--Ingredients Catalog
         id_ingred = self.id_ingred
-        iconPath, modPath, modb_p = (u'Clutter\\IconBook9.dds',
-                                     u'Clutter\\Books\\Octavo02.NIF','\x03>@A')
+        iconPath, modPath, modb_p = ('Clutter\\IconBook9.dds',
+                                     'Clutter\\Books\\Octavo02.NIF','\x03>@A')
         for (num,objectId,full,value) in _ingred_alchem:
-            book = getBook(objectId, u'cobCatAlchemIngreds%s' % num, full,
+            book = getBook(objectId, 'cobCatAlchemIngreds%s' % num, full,
                            value, iconPath, modPath, modb_p)
             with sio(book.text) as buff:
                 buff.seek(0,os.SEEK_END)
                 buffWrite = buff.write
-                for eid, full, effects in sorted(id_ingred.values(),
+                for eid, full, effects in sorted(list(id_ingred.values()),
                                                  key=lambda a: a[1].lower()):
-                    buffWrite(full+u'\r\n')
+                    buffWrite(full+'\r\n')
                     for mgef,actorValue in effects[:num]:
                         effectName = mgef_name[mgef]
                         if mgef in actorEffects:
                             effectName += actorNames[actorValue]
-                        buffWrite(u'  '+effectName+u'\r\n')
-                    buffWrite(u'\r\n')
-                book.text = re.sub(u'\r\n',u'<br>\r\n',buff.getvalue())
+                        buffWrite('  '+effectName+'\r\n')
+                    buffWrite('\r\n')
+                book.text = re.sub('\r\n','<br>\r\n',buff.getvalue())
         #--Get Ingredients by Effect
         effect_ingred = collections.defaultdict(list)
-        for fid,(eid,full,effects) in id_ingred.iteritems():
+        for fid,(eid,full,effects) in id_ingred.items():
             for index,(mgef,actorValue) in enumerate(effects):
                 effectName = mgef_name[mgef]
                 if mgef in actorEffects: effectName += actorNames[actorValue]
                 effect_ingred[effectName].append((index,full))
         #--Effect catalogs
-        iconPath, modPath, modb_p = (u'Clutter\\IconBook7.dds',
-                                     u'Clutter\\Books\\Octavo01.NIF','\x03>@A')
+        iconPath, modPath, modb_p = ('Clutter\\IconBook7.dds',
+                                     'Clutter\\Books\\Octavo01.NIF','\x03>@A')
         for (num, objectId, full, value) in _effect_alchem:
-            book = getBook(objectId, u'cobCatAlchemEffects%s' % num, full,
+            book = getBook(objectId, 'cobCatAlchemEffects%s' % num, full,
                            value, iconPath, modPath, modb_p)
             with sio(book.text) as buff:
                 buff.seek(0,os.SEEK_END)
@@ -162,17 +162,17 @@ class AlchemicalCatalogs(_AAlchemicalCatalogs,Patcher):
                     effects = [indexFull for indexFull in
                                effect_ingred[effectName] if indexFull[0] < num]
                     if effects:
-                        buffWrite(effectName + u'\r\n')
+                        buffWrite(effectName + '\r\n')
                         for (index, full) in sorted(effects, key=lambda a: a[
                             1].lower()):
-                            exSpace = u' ' if index == 0 else u''
-                            buffWrite(u' %s%s %s\r\n'%(index + 1,exSpace,full))
-                        buffWrite(u'\r\n')
-                book.text = re.sub(u'\r\n',u'<br>\r\n',buff.getvalue())
+                            exSpace = ' ' if index == 0 else ''
+                            buffWrite(' %s%s %s\r\n'%(index + 1,exSpace,full))
+                        buffWrite('\r\n')
+                book.text = re.sub('\r\n','<br>\r\n',buff.getvalue())
         #--Log
-        log.setHeader(u'= '+self.__class__.name)
-        log(u'* '+_(u'Ingredients Cataloged') + u': %d' % len(id_ingred))
-        log(u'* '+_(u'Effects Cataloged') + u': %d' % len(effect_ingred))
+        log.setHeader('= '+self.__class__.name)
+        log('* '+_('Ingredients Cataloged') + ': %d' % len(id_ingred))
+        log('* '+_('Effects Cataloged') + ': %d' % len(effect_ingred))
 
 class CBash_AlchemicalCatalogs(_AAlchemicalCatalogs,CBash_Patcher):
     srcs = [] #so as not to fail screaming when determining load mods - but
@@ -181,7 +181,7 @@ class CBash_AlchemicalCatalogs(_AAlchemicalCatalogs,CBash_Patcher):
     #--Config Phase -----------------------------------------------------------
     def initPatchFile(self,patchFile,loadMods):
         super(CBash_AlchemicalCatalogs, self).initPatchFile(patchFile,loadMods)
-        self.isActive = GPath(u'Cobl Main.esm') in loadMods
+        self.isActive = GPath('Cobl Main.esm') in loadMods
         if not self.isActive: return
         patchFile.indexMGEFs = True
         self.id_ingred = {}
@@ -210,56 +210,56 @@ class CBash_AlchemicalCatalogs(_AAlchemicalCatalogs,CBash_Patcher):
         pstate = 0
         #--Setup
         try:
-            coblMod = patchFile.Current.LookupModFile(u'Cobl Main.esm')
+            coblMod = patchFile.Current.LookupModFile('Cobl Main.esm')
         except KeyError as error:
-            print u"CBash_AlchemicalCatalogs:finishPatch"
-            print error[0]
+            print("CBash_AlchemicalCatalogs:finishPatch")
+            print(error[0])
             return
 
         mgef_name = patchFile.mgef_name.copy()
         for mgef in mgef_name:
-            mgef_name[mgef] = re.sub(_(u'(Attribute|Skill)'), u'',
+            mgef_name[mgef] = re.sub(_('(Attribute|Skill)'), '',
                                      mgef_name[mgef])
         actorEffects = bush.genericAVEffects
         actorNames = bush.actorValues
         #--Book generator
         def getBook(patchFile, objectId):
             book = coblMod.LookupRecord(
-                FormID(GPath(u'Cobl Main.esm'), objectId))
+                FormID(GPath('Cobl Main.esm'), objectId))
             # There have been reports of this patcher failing, hence the
             # sanity checks
             if book:
                 if book.recType != 'BOOK':
                     _PrintFormID(fid)
-                    print patchFile.Current.Debug_DumpModFiles()
-                    print book
-                    raise StateError(u"Cobl Catalogs: Unable to lookup book"
-                                     u" record in Cobl Main.esm!")
+                    print(patchFile.Current.Debug_DumpModFiles())
+                    print(book)
+                    raise StateError("Cobl Catalogs: Unable to lookup book"
+                                     " record in Cobl Main.esm!")
                 book = book.CopyAsOverride(self.patchFile)
                 if not book:
                     _PrintFormID(fid)
-                    print patchFile.Current.Debug_DumpModFiles()
-                    print book
+                    print(patchFile.Current.Debug_DumpModFiles())
+                    print(book)
                     book = coblMod.LookupRecord(
-                        FormID(GPath(u'Cobl Main.esm'), objectId))
-                    print book
-                    print book.text
-                    print
-                    raise StateError(u"Cobl Catalogs: Unable to create book!")
+                        FormID(GPath('Cobl Main.esm'), objectId))
+                    print(book)
+                    print(book.text)
+                    print()
+                    raise StateError("Cobl Catalogs: Unable to create book!")
             return book
         #--Ingredients Catalog
         id_ingred = self.id_ingred
         for (num, objectId, full, value) in _ingred_alchem:
-            subProgress(pstate, _(u'Cataloging Ingredients...')+u'\n%s' % full)
+            subProgress(pstate, _('Cataloging Ingredients...')+'\n%s' % full)
             pstate += 1
             book = getBook(patchFile, objectId)
             if not book: continue
             with sio() as buff:
-                buff.write(u'<div align="left"><font face=3 color=4444>' + _(
-                    u"Salan's Catalog of ") + u"%s\r\n\r\n" % full)
+                buff.write('<div align="left"><font face=3 color=4444>' + _(
+                    "Salan's Catalog of ") + "%s\r\n\r\n" % full)
                 for eid, full, effects_list in sorted(
-                        id_ingred.values(),key=lambda a: a[1].lower()):
-                    buff.write(full+u'\r\n')
+                        list(id_ingred.values()),key=lambda a: a[1].lower()):
+                    buff.write(full+'\r\n')
                     for effect in effects_list[:num]:
                         mgef = effect[0] #name field
                         try:
@@ -267,29 +267,29 @@ class CBash_AlchemicalCatalogs(_AAlchemicalCatalogs,CBash_Patcher):
                         except KeyError:
                             if not self.DebugPrintOnce:
                                 self.DebugPrintOnce = 1
-                                print patchFile.Current.Debug_DumpModFiles()
-                                print
-                                print u'mgef_name:', mgef_name
-                                print
-                                print u'mgef:', mgef
-                                print
+                                print(patchFile.Current.Debug_DumpModFiles())
+                                print()
+                                print('mgef_name:', mgef_name)
+                                print()
+                                print('mgef:', mgef)
+                                print()
                                 if mgef in bush.mgef_name:
-                                    print u'mgef found in bush.mgef_name'
+                                    print('mgef found in bush.mgef_name')
                                 else:
-                                    print u'mgef not found in bush.mgef_name'
+                                    print('mgef not found in bush.mgef_name')
                             if mgef in bush.mgef_name:
-                                effectName = re.sub(_(u'(Attribute|Skill)'),
-                                                    u'', bush.mgef_name[mgef])
+                                effectName = re.sub(_('(Attribute|Skill)'),
+                                                    '', bush.mgef_name[mgef])
                             else:
-                                effectName = u'Unknown Effect'
+                                effectName = 'Unknown Effect'
                         if mgef in actorEffects: effectName += actorNames[
                             effect[5]]  # actorValue field
-                        buff.write(u'  '+effectName+u'\r\n')
-                    buff.write(u'\r\n')
-                book.text = re.sub(u'\r\n',u'<br>\r\n',buff.getvalue())
+                        buff.write('  '+effectName+'\r\n')
+                    buff.write('\r\n')
+                book.text = re.sub('\r\n','<br>\r\n',buff.getvalue())
         #--Get Ingredients by Effect
         effect_ingred = self.effect_ingred = collections.defaultdict(list)
-        for fid,(eid,full,effects_list) in id_ingred.iteritems():
+        for fid,(eid,full,effects_list) in id_ingred.items():
             for index,effect in enumerate(effects_list):
                 mgef, actorValue = effect[0], effect[5]
                 try:
@@ -297,42 +297,42 @@ class CBash_AlchemicalCatalogs(_AAlchemicalCatalogs,CBash_Patcher):
                 except KeyError:
                     if not self.DebugPrintOnce:
                         self.DebugPrintOnce = 1
-                        print patchFile.Current.Debug_DumpModFiles()
-                        print
-                        print u'mgef_name:', mgef_name
-                        print
-                        print u'mgef:', mgef
-                        print
+                        print(patchFile.Current.Debug_DumpModFiles())
+                        print()
+                        print('mgef_name:', mgef_name)
+                        print()
+                        print('mgef:', mgef)
+                        print()
                         if mgef in bush.mgef_name:
-                            print u'mgef found in bush.mgef_name'
+                            print('mgef found in bush.mgef_name')
                         else:
-                            print u'mgef not found in bush.mgef_name'
+                            print('mgef not found in bush.mgef_name')
                     if mgef in bush.mgef_name:
-                        effectName = re.sub(_(u'(Attribute|Skill)'), u'',
+                        effectName = re.sub(_('(Attribute|Skill)'), '',
                                             bush.mgef_name[mgef])
                     else:
-                        effectName = u'Unknown Effect'
+                        effectName = 'Unknown Effect'
                 if mgef in actorEffects: effectName += actorNames[actorValue]
                 effect_ingred[effectName].append((index, full))
         #--Effect catalogs
         for (num, objectId, full, value) in _effect_alchem:
-            subProgress(pstate, _(u'Cataloging Effects...')+u'\n%s' % full)
+            subProgress(pstate, _('Cataloging Effects...')+'\n%s' % full)
             book = getBook(patchFile,objectId)
             with sio() as buff:
-                buff.write(u'<div align="left"><font face=3 color=4444>' + _(
-                    u"Salan's Catalog of ") + u"%s\r\n\r\n" % full)
+                buff.write('<div align="left"><font face=3 color=4444>' + _(
+                    "Salan's Catalog of ") + "%s\r\n\r\n" % full)
                 for effectName in sorted(effect_ingred.keys()):
                     effects = [indexFull for indexFull in
                                effect_ingred[effectName] if indexFull[0] < num]
                     if effects:
-                        buff.write(effectName+u'\r\n')
+                        buff.write(effectName+'\r\n')
                         for (index, full) in sorted(effects, key=lambda a: a[
                             1].lower()):
-                            exSpace = u' ' if index == 0 else u''
+                            exSpace = ' ' if index == 0 else ''
                             buff.write(
-                                u' %s%s %s\r\n' % (index + 1, exSpace, full))
-                        buff.write(u'\r\n')
-                book.text = re.sub(u'\r\n',u'<br>\r\n',buff.getvalue())
+                                ' %s%s %s\r\n' % (index + 1, exSpace, full))
+                        buff.write('\r\n')
+                book.text = re.sub('\r\n','<br>\r\n',buff.getvalue())
             pstate += 1
 
     def buildPatchLog(self,log):
@@ -341,9 +341,9 @@ class CBash_AlchemicalCatalogs(_AAlchemicalCatalogs,CBash_Patcher):
         #--Log
         id_ingred = self.id_ingred
         effect_ingred = self.effect_ingred
-        log.setHeader(u'= '+self.__class__.name)
-        log(u'* '+_(u'Ingredients Cataloged') + u': %d' % len(id_ingred))
-        log(u'* '+_(u'Effects Cataloged') + u': %d' % len(effect_ingred))
+        log.setHeader('= '+self.__class__.name)
+        log('* '+_('Ingredients Cataloged') + ': %d' % len(id_ingred))
+        log('* '+_('Effects Cataloged') + ': %d' % len(effect_ingred))
 
 #------------------------------------------------------------------------------
 class _DefaultDictLog(CBash_ListPatcher):
@@ -362,25 +362,25 @@ class _ACoblExhaustion(SpecialPatcher):
     # TODO: readFromText differ only in (PBash -> CBash):
     # -         longid = (aliases.get(mod,mod),int(objectIndex[2:],16))
     # +         longid = FormID(aliases.get(mod,mod),int(objectIndex[2:],16))
-    name = _(u'Cobl Exhaustion')
-    text = (_(u"Modify greater powers to use Cobl's Power Exhaustion feature.")
-            + u'\n\n' + _(u'Will only run if Cobl Main v1.66 (or higher) is'
-                          u' active.'))
+    name = _('Cobl Exhaustion')
+    text = (_("Modify greater powers to use Cobl's Power Exhaustion feature.")
+            + '\n\n' + _('Will only run if Cobl Main v1.66 (or higher) is'
+                          ' active.'))
     canAutoItemCheck = False #--GUI: Whether new items are checked by default
-    autoKey = {u'Exhaust'}
+    autoKey = {'Exhaust'}
 
     def _pLog(self, log, count):
-        log.setHeader(u'= ' + self.__class__.name)
-        log(u'* ' + _(u'Powers Tweaked') + u': %d' % sum(count.values()))
-        for srcMod in load_order.get_ordered(count.keys()):
-            log(u'  * %s: %d' % (srcMod.s, count[srcMod]))
+        log.setHeader('= ' + self.__class__.name)
+        log('* ' + _('Powers Tweaked') + ': %d' % sum(count.values()))
+        for srcMod in load_order.get_ordered(list(count.keys())):
+            log('  * %s: %d' % (srcMod.s, count[srcMod]))
 
 class CoblExhaustion(_ACoblExhaustion,ListPatcher):
 
     #--Patch Phase ------------------------------------------------------------
     def initPatchFile(self,patchFile,loadMods):
         super(CoblExhaustion, self).initPatchFile(patchFile, loadMods)
-        self.cobl = GPath(u'Cobl Main.esm')
+        self.cobl = GPath('Cobl Main.esm')
         self.isActive = bool(self.srcs) and (
             self.cobl in loadMods and bosh.modInfos.getVersionFloat(
                 self.cobl) > 1.65)
@@ -392,9 +392,9 @@ class CoblExhaustion(_ACoblExhaustion,ListPatcher):
         id_exhaustion = self.id_exhaustion
         textPath = GPath(textPath)
         with CsvReader(textPath) as ins:
-            reNum = re.compile(ur'\d+',re.U)
+            reNum = re.compile(r'\d+',re.U)
             for fields in ins:
-                if len(fields) < 4 or fields[1][:2] != u'0x' or \
+                if len(fields) < 4 or fields[1][:2] != '0x' or \
                         not reNum.match(fields[3]):
                     continue
                 mod,objectIndex,eid,time = fields[:4]
@@ -454,7 +454,7 @@ class CoblExhaustion(_ACoblExhaustion,ListPatcher):
             effect.name = 'SEFF'
             effect.duration = duration
             scriptEffect = record.getDefault('effects.scriptEffect')
-            scriptEffect.full = u"Power Exhaustion"
+            scriptEffect.full = "Power Exhaustion"
             scriptEffect.script = exhaustId
             scriptEffect.school = 2
             scriptEffect.visual = null4
@@ -474,7 +474,7 @@ class CBash_CoblExhaustion(_ACoblExhaustion, _DefaultDictLog):
     def initPatchFile(self,patchFile,loadMods):
         super(CBash_CoblExhaustion, self).initPatchFile(patchFile, loadMods)
         if not self.isActive: return
-        self.cobl = GPath(u'Cobl Main.esm')
+        self.cobl = GPath('Cobl Main.esm')
         self.isActive = (self.cobl in loadMods and
                          bosh.modInfos.getVersionFloat(self.cobl) > 1.65)
         self.id_exhaustion = {}
@@ -501,9 +501,9 @@ class CBash_CoblExhaustion(_ACoblExhaustion, _DefaultDictLog):
         id_exhaustion = self.id_exhaustion
         textPath = GPath(textPath)
         with CsvReader(textPath) as ins:
-            reNum = re.compile(ur'\d+',re.U)
+            reNum = re.compile(r'\d+',re.U)
             for fields in ins:
-                if len(fields) < 4 or fields[1][:2] != u'0x' or \
+                if len(fields) < 4 or fields[1][:2] != '0x' or \
                         not reNum.match(fields[3]):
                     continue
                 mod,objectIndex,eid,time = fields[:4]
@@ -525,12 +525,12 @@ class CBash_CoblExhaustion(_ACoblExhaustion, _DefaultDictLog):
             #--Okay, do it
             override = record.CopyAsOverride(self.patchFile)
             if override:
-                override.full = u'+' + override.full
+                override.full = '+' + override.full
                 override.IsLesserPower = True
                 effect = override.create_effect()
                 effect.name = self.SEFF
                 effect.duration = duration
-                effect.full = u'Power Exhaustion'
+                effect.full = 'Power Exhaustion'
                 effect.script = self.exhaustionId
                 effect.IsDestruction = True
                 effect.visual = MGEFCode(None,None)
@@ -542,22 +542,22 @@ class CBash_CoblExhaustion(_ACoblExhaustion, _DefaultDictLog):
 #------------------------------------------------------------------------------
 class _AMFactMarker(SpecialPatcher):
     """Mark factions that player can acquire while morphing."""
-    name = _(u'Morph Factions')
-    text = (_(u"Mark factions that player can acquire while morphing.") +
-            u'\n\n' +
-            _(u"Requires Cobl 1.28 and Wrye Morph or similar.")
+    name = _('Morph Factions')
+    text = (_("Mark factions that player can acquire while morphing.") +
+            '\n\n' +
+            _("Requires Cobl 1.28 and Wrye Morph or similar.")
             )
-    autoRe = re.compile(ur"^UNDEFINED$",re.I|re.U)
+    autoRe = re.compile(r"^UNDEFINED$",re.I|re.U)
     canAutoItemCheck = False #--GUI: Whether new items are checked by default
-    srcsHeader = u'=== ' + _(u'Source Mods/Files')
-    autoKey = {u'MFact'}
+    srcsHeader = '=== ' + _('Source Mods/Files')
+    autoKey = {'MFact'}
 
     def _pLog(self, log, changed):
-        log.setHeader(u'= ' + self.__class__.name)
+        log.setHeader('= ' + self.__class__.name)
         self._srcMods(log)
-        log(u'\n=== ' + _(u'Morphable Factions'))
+        log('\n=== ' + _('Morphable Factions'))
         for mod in load_order.get_ordered(changed):
-            log(u'* %s: %d' % (mod.s, changed[mod]))
+            log('* %s: %d' % (mod.s, changed[mod]))
 
 class MFactMarker(_AMFactMarker,ListPatcher):
 
@@ -566,8 +566,8 @@ class MFactMarker(_AMFactMarker,ListPatcher):
         super(MFactMarker, self).initPatchFile(patchFile, loadMods)
         self.id_info = {} #--Morphable factions keyed by fid
         self.isActive = bool(self.srcs) and load_order.cached_is_active(
-            GPath(u"Cobl Main.esm"))
-        self.mFactLong = (GPath(u"Cobl Main.esm"),0x33FB)
+            GPath("Cobl Main.esm"))
+        self.mFactLong = (GPath("Cobl Main.esm"),0x33FB)
 
     def initData(self,progress):
         """Get names from source files."""
@@ -579,7 +579,7 @@ class MFactMarker(_AMFactMarker,ListPatcher):
             if not textPath.exists(): continue
             with CsvReader(textPath) as ins:
                 for fields in ins:
-                    if len(fields) < 6 or fields[1][:2] != u'0x':
+                    if len(fields) < 6 or fields[1][:2] != '0x':
                         continue
                     mod,objectIndex = fields[:2]
                     mod = GPath(mod)
@@ -587,7 +587,7 @@ class MFactMarker(_AMFactMarker,ListPatcher):
                     morphName = fields[4].strip()
                     rankName = fields[5].strip()
                     if not morphName: continue
-                    if not rankName: rankName = _(u'Member')
+                    if not rankName: rankName = _('Member')
                     id_info[longid] = (morphName,rankName)
 
     def getReadClasses(self):
@@ -605,7 +605,7 @@ class MFactMarker(_AMFactMarker,ListPatcher):
         modName = modFile.fileInfo.name
         mapper = modFile.getLongMapper()
         patchBlock = self.patchFile.FACT
-        if modFile.fileInfo.name == GPath(u"Cobl Main.esm"):
+        if modFile.fileInfo.name == GPath("Cobl Main.esm"):
             modFile.convertToLongFids(('FACT',))
             record = modFile.FACT.getRecord(self.mFactLong)
             if record:
@@ -647,7 +647,7 @@ class MFactMarker(_AMFactMarker,ListPatcher):
                     if not rank.female: rank.female = rank.male
                     if not rank.insigniaPath:
                         rank.insigniaPath = \
-                            u'Menus\\Stats\\Cobl\\generic%02d.dds' % rank.rank
+                            'Menus\\Stats\\Cobl\\generic%02d.dds' % rank.rank
                 keep(record.fid)
                 mod = record.fid[0]
                 changed[mod] += 1
@@ -665,13 +665,13 @@ class MFactMarker(_AMFactMarker,ListPatcher):
         self._pLog(log, changed)
 
 class CBash_MFactMarker(_AMFactMarker, _DefaultDictLog):
-    unloadedText = u""
+    unloadedText = ""
 
     #--Config Phase -----------------------------------------------------------
     def initPatchFile(self,patchFile,loadMods):
         super(CBash_MFactMarker, self).initPatchFile(patchFile, loadMods)
         if not self.isActive: return
-        self.cobl = GPath(u'Cobl Main.esm')
+        self.cobl = GPath('Cobl Main.esm')
         self.isActive = self.cobl in loadMods and \
                         bosh.modInfos.getVersionFloat(self.cobl) > 1.27
         self.id_info = {} #--Morphable factions keyed by fid
@@ -700,7 +700,7 @@ class CBash_MFactMarker(_AMFactMarker, _DefaultDictLog):
         if not textPath.exists(): return
         with CsvReader(textPath) as ins:
             for fields in ins:
-                if len(fields) < 6 or fields[1][:2] != u'0x':
+                if len(fields) < 6 or fields[1][:2] != '0x':
                     continue
                 mod,objectIndex = fields[:2]
                 mod = GPath(mod)
@@ -708,7 +708,7 @@ class CBash_MFactMarker(_AMFactMarker, _DefaultDictLog):
                 morphName = fields[4].strip()
                 rankName = fields[5].strip()
                 if not morphName: continue
-                if not rankName: rankName = _(u'Member')
+                if not rankName: rankName = _('Member')
                 id_info[longid] = (morphName,rankName)
 
     #--Patch Phase ------------------------------------------------------------
@@ -735,7 +735,7 @@ class CBash_MFactMarker(_AMFactMarker, _DefaultDictLog):
                         if not rank.female: rank.female = rank.male
                         if not rank.insigniaPath:
                             rank.insigniaPath = \
-                            u'Menus\\Stats\\Cobl\\generic%02d.dds' % rank.rank
+                            'Menus\\Stats\\Cobl\\generic%02d.dds' % rank.rank
                     self.mod_count[modFile.GName] += 1
                     record.UnloadRecord()
                     record._RecordID = override._RecordID
@@ -751,17 +751,17 @@ class CBash_MFactMarker(_AMFactMarker, _DefaultDictLog):
         record = coblMod.LookupRecord(self.mFactLong)
         if record.recType != 'FACT':
             _PrintFormID(self.mFactLong)
-            print patchFile.Current.Debug_DumpModFiles()
-            print record
-            raise StateError(u"Cobl Morph Factions: Unable to lookup morphable"
-                             u" faction record in Cobl Main.esm!")
+            print(patchFile.Current.Debug_DumpModFiles())
+            print(record)
+            raise StateError("Cobl Morph Factions: Unable to lookup morphable"
+                             " faction record in Cobl Main.esm!")
 
         override = record.CopyAsOverride(patchFile)
         if override:
             override.relations = None
             pstate = 0
             for faction in mFactable:
-                subProgress(pstate, _(u'Marking Morphable Factions...')+u'\n')
+                subProgress(pstate, _('Marking Morphable Factions...')+'\n')
                 relation = override.create_relation()
                 relation.faction = faction
                 relation.mod = 10
@@ -771,9 +771,9 @@ class CBash_MFactMarker(_AMFactMarker, _DefaultDictLog):
 #------------------------------------------------------------------------------
 class _ASEWorldEnforcer(SpecialPatcher):
     """Suspends Cyrodiil quests while in Shivering Isles."""
-    name = _(u'SEWorld Tests')
-    text = _(u"Suspends Cyrodiil quests while in Shivering Isles. I.e. "
-             u"re-instates GetPlayerInSEWorld tests as necessary.")
+    name = _('SEWorld Tests')
+    text = _("Suspends Cyrodiil quests while in Shivering Isles. I.e. "
+             "re-instates GetPlayerInSEWorld tests as necessary.")
     # CONFIG DEFAULTS
     default_isEnabled = True
 
@@ -782,9 +782,9 @@ class SEWorldEnforcer(_ASEWorldEnforcer,Patcher):
     def initPatchFile(self,patchFile,loadMods):
         super(SEWorldEnforcer, self).initPatchFile(patchFile, loadMods)
         self.cyrodiilQuests = set()
-        if GPath(u'Oblivion.esm') in loadMods:
+        if GPath('Oblivion.esm') in loadMods:
             loadFactory = LoadFactory(False,MreRecord.type_class['QUST'])
-            modInfo = bosh.modInfos[GPath(u'Oblivion.esm')]
+            modInfo = bosh.modInfos[GPath('Oblivion.esm')]
             modFile = ModFile(modInfo,loadFactory)
             modFile.load(True)
             mapper = modFile.getLongMapper()
@@ -805,7 +805,7 @@ class SEWorldEnforcer(_ASEWorldEnforcer,Patcher):
 
     def scanModFile(self,modFile,progress):
         if not self.isActive: return
-        if modFile.fileInfo.name == GPath(u'Oblivion.esm'): return
+        if modFile.fileInfo.name == GPath('Oblivion.esm'): return
         cyrodiilQuests = self.cyrodiilQuests
         mapper = modFile.getLongMapper()
         patchBlock = self.patchFile.QUST
@@ -836,7 +836,7 @@ class SEWorldEnforcer(_ASEWorldEnforcer,Patcher):
                 keep(record.fid)
                 patched.append(record.eid)
         log.setHeader('= '+self.__class__.name)
-        log(u'==='+_(u'Quests Patched') + u': %d' % (len(patched),))
+        log('==='+_('Quests Patched') + ': %d' % (len(patched),))
 
 class CBash_SEWorldEnforcer(_ASEWorldEnforcer,CBash_Patcher):
     scanRequiresChecked = True
@@ -846,7 +846,7 @@ class CBash_SEWorldEnforcer(_ASEWorldEnforcer,CBash_Patcher):
     def initPatchFile(self,patchFile,loadMods):
         super(CBash_SEWorldEnforcer, self).initPatchFile(patchFile, loadMods)
         self.cyrodiilQuests = set()
-        self.srcs = [GPath(u'Oblivion.esm')]
+        self.srcs = [GPath('Oblivion.esm')]
         self.isActive = self.srcs[0] in loadMods
         self.mod_eids = collections.defaultdict(list)
 
@@ -885,24 +885,24 @@ class CBash_SEWorldEnforcer(_ASEWorldEnforcer,CBash_Patcher):
         """Will write to log."""
         if not self.isActive: return
         #--Log
-        log.setHeader(u'= ' +self.__class__.name)
-        log(u'\n=== '+_(u'Quests Patched'))
-        for mod, eids in self.mod_eids.iteritems():
-            log(u'* %s: %d' % (mod.s, len(eids)))
+        log.setHeader('= ' +self.__class__.name)
+        log('\n=== '+_('Quests Patched'))
+        for mod, eids in self.mod_eids.items():
+            log('* %s: %d' % (mod.s, len(eids)))
             for eid in sorted(eids):
-                log(u'  * %s' % eid)
+                log('  * %s' % eid)
         self.mod_eids = collections.defaultdict(list)
 
 # Alchemical Catalogs ---------------------------------------------------------
 _ingred_alchem = (
-    (1,0xCED,_(u'Alchemical Ingredients I'),250),
-    (2,0xCEC,_(u'Alchemical Ingredients II'),500),
-    (3,0xCEB,_(u'Alchemical Ingredients III'),1000),
-    (4,0xCE7,_(u'Alchemical Ingredients IV'),2000),
+    (1,0xCED,_('Alchemical Ingredients I'),250),
+    (2,0xCEC,_('Alchemical Ingredients II'),500),
+    (3,0xCEB,_('Alchemical Ingredients III'),1000),
+    (4,0xCE7,_('Alchemical Ingredients IV'),2000),
 )
 _effect_alchem = (
-    (1,0xCEA,_(u'Alchemical Effects I'),500),
-    (2,0xCE9,_(u'Alchemical Effects II'),1000),
-    (3,0xCE8,_(u'Alchemical Effects III'),2000),
-    (4,0xCE6,_(u'Alchemical Effects IV'),4000),
+    (1,0xCEA,_('Alchemical Effects I'),500),
+    (2,0xCE9,_('Alchemical Effects II'),1000),
+    (3,0xCE8,_('Alchemical Effects III'),2000),
+    (4,0xCE6,_('Alchemical Effects IV'),4000),
 )

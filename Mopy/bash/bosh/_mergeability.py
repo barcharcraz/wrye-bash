@@ -34,19 +34,19 @@ def _is_mergeable_no_load(modInfo, verbose):
     reasons = []
     if modInfo.isEsm():
         if not verbose: return False
-        reasons.append(u'\n.    '+_(u'Is esm.'))
+        reasons.append('\n.    '+_('Is esm.'))
     #--Bashed Patch
     if modInfo.isBP():
         if not verbose: return False
-        reasons.append(u'\n.    '+_(u'Is Bashed Patch.'))
+        reasons.append('\n.    '+_('Is Bashed Patch.'))
     #--Bsa / voice?
     if tuple(modInfo.hasResources()) != (False, False):
         if not verbose: return False
         hasBsa, hasVoices = modInfo.hasResources()
         if hasBsa:
-            reasons.append(u'\n.    '+_(u'Has BSA archive.'))
+            reasons.append('\n.    '+_('Has BSA archive.'))
         if hasVoices:
-            reasons.append(u'\n.    '+_(u'Has associated voice directory (Sound\\Voice\\%s).') % modInfo.name.s)
+            reasons.append('\n.    '+_('Has associated voice directory (Sound\\Voice\\%s).') % modInfo.name.s)
     # Client must make sure NoMerge tag not in tags - if in tags
     # don't show up as mergeable.
     if reasons: return reasons
@@ -55,16 +55,16 @@ def _is_mergeable_no_load(modInfo, verbose):
 def pbash_mergeable_no_load(modInfo, verbose):
     reasons = _is_mergeable_no_load(modInfo, verbose)
     if isinstance(reasons, list):
-        reasons = u''.join(reasons)
+        reasons = ''.join(reasons)
     elif not reasons:
         return False # non verbose mode
     else: # True
-        reasons = u''
+        reasons = ''
     #--Missing Strings Files?
     if modInfo.isMissingStrings():
         if not verbose: return False
         from . import oblivionIni
-        reasons += u'\n.    '+_(u'Missing String Translation Files (Strings\\%s_%s.STRINGS, etc).') % (
+        reasons += '\n.    '+_('Missing String Translation Files (Strings\\%s_%s.STRINGS, etc).') % (
             modInfo.name.sbody, oblivionIni.get_ini_language())
     if reasons: return reasons
     return True
@@ -72,12 +72,12 @@ def pbash_mergeable_no_load(modInfo, verbose):
 def isPBashMergeable(modInfo, minfos, verbose):
     """Returns True or error message indicating whether specified mod is mergeable."""
     reasons = pbash_mergeable_no_load(modInfo, verbose)
-    if isinstance(reasons, unicode):
+    if isinstance(reasons, str):
         pass
     elif not reasons:
         return False # non verbose mode
     else: # True
-        reasons = u''
+        reasons = ''
     #--Load test
     mergeTypes = set(recClass.classType for recClass in bush.game.mergeClasses)
     modFile = ModFile(modInfo, LoadFactory(False, *mergeTypes))
@@ -85,38 +85,38 @@ def isPBashMergeable(modInfo, minfos, verbose):
         modFile.load(True,loadStrings=False)
     except ModError as error:
         if not verbose: return False
-        reasons += u'\n.    %s.' % error
+        reasons += '\n.    %s.' % error
     #--Skipped over types?
     if modFile.topsSkipped:
         if not verbose: return False
-        reasons += u'\n.    '+_(u'Unsupported types: ')+u', '.join(sorted(modFile.topsSkipped))+u'.'
+        reasons += '\n.    '+_('Unsupported types: ')+', '.join(sorted(modFile.topsSkipped))+'.'
     #--Empty mod
     elif not modFile.tops:
         if not verbose: return False
-        reasons += u'\n.    '+ u'Empty mod.'
+        reasons += '\n.    '+ 'Empty mod.'
     #--New record
     lenMasters = len(modFile.tes4.masters)
     newblocks = []
-    for type,block in modFile.tops.iteritems():
+    for type,block in modFile.tops.items():
         for record in block.getActiveRecords():
             if record.fid >> 24 >= lenMasters:
                 if record.flags1.deleted: continue #if new records exist but are deleted just skip em.
                 if not verbose: return False
                 newblocks.append(type)
                 break
-    if newblocks: reasons += u'\n.    '+_(u'New record(s) in block(s): ')+u', '.join(sorted(newblocks))+u'.'
-    dependent = [name.s for name, info in minfos.iteritems()
+    if newblocks: reasons += '\n.    '+_('New record(s) in block(s): ')+', '.join(sorted(newblocks))+'.'
+    dependent = [name.s for name, info in minfos.items()
                  if not info.isBP() and modInfo.name in info.header.masters]
     if dependent:
         if not verbose: return False
-        reasons += u'\n.    '+_(u'Is a master of mod(s): ')+u', '.join(sorted(dependent))+u'.'
+        reasons += '\n.    '+_('Is a master of mod(s): ')+', '.join(sorted(dependent))+'.'
     if reasons: return reasons
     return True
 
 def _modIsMergeableLoad(modInfo, minfos, verbose):
     """Check if mod is mergeable, loading it and taking into account the
     rest of mods."""
-    allowMissingMasters = {u'Filter', u'IIM', u'InventOnly'}
+    allowMissingMasters = {'Filter', 'IIM', 'InventOnly'}
     tags = modInfo.getBashTags()
     reasons = []
 
@@ -141,36 +141,36 @@ def _modIsMergeableLoad(modInfo, minfos, verbose):
         #--masters not present in mod list?
         if len(missingMasters):
             if not verbose: return False
-            reasons.append(u'\n.    '+_(u'Masters missing: ')+u'\n    * %s' % (u'\n    * '.join(sorted(missingMasters))))
+            reasons.append('\n.    '+_('Masters missing: ')+'\n    * %s' % ('\n    * '.join(sorted(missingMasters))))
         if len(nonActiveMasters):
             if not verbose: return False
-            reasons.append(u'\n.    '+_(u'Masters not active: ')+u'\n    * %s' % (u'\n    * '.join(sorted(nonActiveMasters))))
+            reasons.append('\n.    '+_('Masters not active: ')+'\n    * %s' % ('\n    * '.join(sorted(nonActiveMasters))))
         #--Empty mod
         if modFile.IsEmpty():
             if not verbose: return False
-            reasons.append(u'\n.    '+_(u'Empty mod.'))
+            reasons.append('\n.    '+_('Empty mod.'))
         #--New record
         else:
             if not tags & allowMissingMasters:
                 newblocks = modFile.GetNewRecordTypes()
                 if newblocks:
                     if not verbose: return False
-                    reasons.append(u'\n.    '+_(u'New record(s) in block(s): %s.') % u', '.join(sorted(newblocks)))
+                    reasons.append('\n.    '+_('New record(s) in block(s): %s.') % ', '.join(sorted(newblocks)))
         # dependent mods mergeability should be determined BEFORE their masters
-        dependent = [name.s for name, info in minfos.iteritems() if
+        dependent = [name.s for name, info in minfos.items() if
                      not info.isBP() and modInfo.name in info.header.masters
                      and name not in minfos.mergeable]
         if dependent:
             if not verbose: return False
-            reasons.append(u'\n.    '+_(u'Is a master of non-mergeable mod(s): %s.') % u', '.join(sorted(dependent)))
+            reasons.append('\n.    '+_('Is a master of non-mergeable mod(s): %s.') % ', '.join(sorted(dependent)))
         if reasons: return reasons
         return True
 
 def isCBashMergeable(modInfo, minfos, verbose):
     """Returns True or error message indicating whether specified mod is mergeable."""
-    if modInfo.name.s == u"Oscuro's_Oblivion_Overhaul.esp":
-        if verbose: return u'\n.    ' + _(
-            u'Marked non-mergeable at request of mod author.')
+    if modInfo.name.s == "Oscuro's_Oblivion_Overhaul.esp":
+        if verbose: return '\n.    ' + _(
+            'Marked non-mergeable at request of mod author.')
         return False
     canmerge = _is_mergeable_no_load(modInfo, verbose)
     if verbose:
@@ -180,7 +180,7 @@ def isCBashMergeable(modInfo, minfos, verbose):
             reasons = canmerge
         if loadreasons != True:
             reasons.extend(loadreasons)
-        if reasons: return u''.join(reasons)
+        if reasons: return ''.join(reasons)
         return True
     else:
         if canmerge == True:

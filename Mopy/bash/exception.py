@@ -35,24 +35,24 @@ class BoltError(Exception):
 # Code errors -----------------------------------------------------------------
 class AbstractError(BoltError):
     """Coding Error: Abstract code section called."""
-    def __init__(self, message=u'Abstract section called.'):
+    def __init__(self, message='Abstract section called.'):
         super(AbstractError, self).__init__(message)
 
 class ArgumentError(BoltError):
     """Coding Error: Argument out of allowed range of values."""
-    def __init__(self, message=u'Argument is out of allowed ranged of values.'):
+    def __init__(self, message='Argument is out of allowed ranged of values.'):
         super(ArgumentError, self).__init__(message)
 
 # UI exceptions ---------------------------------------------------------------
 class CancelError(BoltError):
     """User pressed 'Cancel' on the progress meter."""
-    def __init__(self, message=u'Action aborted by user.'):
+    def __init__(self, message='Action aborted by user.'):
         super(CancelError, self).__init__(message)
 
 class SkipError(CancelError):
     """User pressed Skipped n operations."""
     def __init__(self):
-        super(SkipError, self).__init__(u'Action skipped by user.')
+        super(SkipError, self).__init__('Action skipped by user.')
 
 # File exceptions -------------------------------------------------------------
 class FileError(BoltError):
@@ -63,7 +63,7 @@ class FileError(BoltError):
         self.in_name = in_name
 
     def __str__(self):
-        return u'{}: {}'.format((self.in_name or u'Unknown File'),
+        return '{}: {}'.format((self.in_name or 'Unknown File'),
                                 self.message)
 
 class SaveFileError(FileError):
@@ -74,13 +74,13 @@ class FileEditError(BoltError):
     """Unable to edit a file"""
     def __init__(self, file_path, message=None):
         ## type: (Path, basestring) -> None
-        message = message or (u'Unable to edit file {}.'.format(file_path.s))
+        message = message or ('Unable to edit file {}.'.format(file_path.s))
         super(FileEditError, self).__init__(message)
         self.filePath = file_path
 
 class PermissionError(BoltError):
     """Wrye Bash doesn't have permission to access the specified file/directory."""
-    def __init__(self, message=u'Access is denied.'):
+    def __init__(self, message='Access is denied.'):
         super(PermissionError, self).__init__(message)
 
 # Mod I/O Errors --------------------------------------------------------------
@@ -96,11 +96,11 @@ class ModReadError(ModError):
         self.try_pos = try_pos
         self.max_pos = max_pos
         if try_pos < 0:
-            message = (u'{}: Attempted to read before ({}) beginning of '
-                       u'file/buffer.'.format(rec_type, try_pos))
+            message = ('{}: Attempted to read before ({}) beginning of '
+                       'file/buffer.'.format(rec_type, try_pos))
         else:
-            message = (u'{}: Attempted to read past ({}) end ({}) of '
-                       u'file/buffer.'.format(rec_type, try_pos, max_pos))
+            message = ('{}: Attempted to read past ({}) end ({}) of '
+                       'file/buffer.'.format(rec_type, try_pos, max_pos))
         super(ModReadError, self).__init__(in_name.s, message)
 
 class ModSizeError(ModError):
@@ -113,13 +113,13 @@ class ModSizeError(ModError):
         self.max_size = max_size
         self.exact_size = exact_size
         if old_skyrim:
-            message_form = (u'\nWrye Bash SSE expects a newer format for {} '
-                            u'than found.\nLoad and save {} with the Skyrim '
-                            u'SE CK\n'.format(rec_type, in_name))
-        else: message_form = u''
+            message_form = ('\nWrye Bash SSE expects a newer format for {} '
+                            'than found.\nLoad and save {} with the Skyrim '
+                            'SE CK\n'.format(rec_type, in_name))
+        else: message_form = ''
         op = '==' if exact_size else '<='
-        message_form += (u'{}: Expected size {} {}, but got: {}'
-                         u''.format(rec_type, op, read_size, max_size))
+        message_form += ('{}: Expected size {} {}, but got: {}'
+                         ''.format(rec_type, op, read_size, max_size))
         super(ModSizeError, self).__init__(in_name.s, message_form)
 
 # Shell (OS) File Operation exceptions ----------------------------------------
@@ -127,27 +127,27 @@ class FileOperationError(OSError):
     def __init__(self, error_code, message=None):
         # type: (int, unicode) -> None
         self.errno = error_code
-        Exception.__init__(self, u'FileOperationError: {}'.format(
-                                    message or unicode(error_code)))
+        Exception.__init__(self, 'FileOperationError: {}'.format(
+                                    message or str(error_code)))
 
 class AccessDeniedError(FileOperationError):
     def __init__(self):
-        super(AccessDeniedError, self).__init__(5, u'Access Denied')
+        super(AccessDeniedError, self).__init__(5, 'Access Denied')
 
 class InvalidPathsError(FileOperationError):
     def __init__(self, source, target): # type: (unicode, unicode) -> None
         super(InvalidPathsError, self).__init__(
-            124, u'Invalid paths:\nsource: {}\ntarget: {}'.format(source, target))
+            124, 'Invalid paths:\nsource: {}\ntarget: {}'.format(source, target))
 
 class DirectoryFileCollisionError(FileOperationError):
     def __init__(self, source, dest):  ## type: (Path, Path) -> None
         super(DirectoryFileCollisionError, self).__init__(
-            -1, u'collision: moving {} to {}'.format(source, dest))
+            -1, 'collision: moving {} to {}'.format(source, dest))
 
 class NonExistentDriveError(FileOperationError):
     def __init__(self, failed_paths):  ## type: (List[Path]) -> None
         self.failed_paths = failed_paths
-        super(NonExistentDriveError, self).__init__(-1, u'non existent drive')
+        super(NonExistentDriveError, self).__init__(-1, 'non existent drive')
 
 # BSA exceptions --------------------------------------------------------------
 class BSAError(Exception): pass
@@ -157,35 +157,35 @@ class BSANotImplemented(BSAError): pass
 class BSAVersionError(BSAError):
     def __init__(self, version, expected_version):
         super(BSAVersionError, self).__init__(
-            u'Unexpected version {!r} - expected {!r}'.format(
+            'Unexpected version {!r} - expected {!r}'.format(
                 version, expected_version))
 
 class BSAFlagError(BSAError):
     def __init__(self, message, flag):  # type: (unicode, int) -> None
         super(BSAFlagError, self).__init__(
-            u'{} (flag {}) unset'.format(message, flag))
+            '{} (flag {}) unset'.format(message, flag))
 
 class BSADecodingError(BSAError):
     def __init__(self, text):  # type: (basestring) -> None
         super(BSADecodingError, self).__init__(
-            u'Undecodable string {!r}'.format(text))
+            'Undecodable string {!r}'.format(text))
 
 # Misc exceptions -------------------------------------------------------------
 class StateError(BoltError):
     """Error: Object is corrupted."""
-    def __init__(self, message=u'Object is in a bad state.'):
+    def __init__(self, message='Object is in a bad state.'):
         super(StateError, self).__init__(message)
 
 class PluginsFullError(BoltError):
     """Usage Error: Attempt to add a mod to plugins when plugins is full."""
-    def __init__(self, message=u'Load list is full.'):
+    def __init__(self, message='Load list is full.'):
         super(PluginsFullError, self).__init__(message)
 
 class MasterMapError(BoltError):
     """Attempt to map a fid when mapping does not exist."""
     def __init__(self, modIndex):  # type: (int) -> None
         super(MasterMapError, self).__init__(
-            u'No valid mapping for mod index 0x{:02X}'.format(modIndex))
+            'No valid mapping for mod index 0x{:02X}'.format(modIndex))
 
 class SaveHeaderError(Exception): pass
 

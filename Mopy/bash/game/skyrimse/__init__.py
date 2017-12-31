@@ -53,93 +53,93 @@ from ..skyrim import patchURL, patchTip, allow_reset_bsa_timestamps, \
     SkipBAINRefresh, supports_mod_inis, resource_archives_keys
 
 #--Name of the game to use in UI.
-displayName = u'Skyrim Special Edition'
+displayName = 'Skyrim Special Edition'
 #--Name of the game's filesystem folder.
-fsName = u'Skyrim Special Edition'
+fsName = 'Skyrim Special Edition'
 #--Alternate display name to use instead of "Wrye Bash for ***"
-altName = u'Wrye Smash'
+altName = 'Wrye Smash'
 #--Name of game's default ini file.
-defaultIniFile = u'Skyrim_Default.ini'
+defaultIniFile = 'Skyrim_Default.ini'
 
 #--Exe to look for to see if this is the right game
-exe = u'SkyrimSE.exe'
+exe = 'SkyrimSE.exe'
 
 #--Registry keys to read to find the install location
-regInstallKeys = (u'Bethesda Softworks\\Skyrim Special Edition', u'Installed Path')
+regInstallKeys = ('Bethesda Softworks\\Skyrim Special Edition', 'Installed Path')
 
 #--URL to the Nexus site for this game
-nexusUrl = u'http://www.nexusmods.com/skyrimspecialedition/'
-nexusName = u'Skyrim SE Nexus'
+nexusUrl = 'http://www.nexusmods.com/skyrimspecialedition/'
+nexusName = 'Skyrim SE Nexus'
 nexusKey = 'bash.installers.openSkyrimSeNexus.continue'
 
 # Bsa info
 vanilla_string_bsas = {
-    u'skyrim.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],
-    u'update.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],
-    u'dawnguard.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],
-    u'hearthfires.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],
-    u'dragonborn.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],
+    'skyrim.esm': ['Skyrim - Patch.bsa', 'Skyrim - Interface.bsa'],
+    'update.esm': ['Skyrim - Patch.bsa', 'Skyrim - Interface.bsa'],
+    'dawnguard.esm': ['Skyrim - Patch.bsa', 'Skyrim - Interface.bsa'],
+    'hearthfires.esm': ['Skyrim - Patch.bsa', 'Skyrim - Interface.bsa'],
+    'dragonborn.esm': ['Skyrim - Patch.bsa', 'Skyrim - Interface.bsa'],
 }
 
 # plugin extensions
-espm_extensions = {u'.esp', u'.esm', u'.esl'}
+espm_extensions = {'.esp', '.esm', '.esl'}
 
 #--Save Game format stuff
 class ess:
     # Save file capabilities
     canReadBasic = True         # All the basic stuff needed for the Saves Tab
     canEditMore = False         # No advanced editing
-    ext = u'.ess'               # Save file extension
+    ext = '.ess'               # Save file extension
 
 #--INI files that should show up in the INI Edits tab
 iniFiles = [
-    u'Skyrim.ini',
-    u'SkyrimPrefs.ini',
+    'Skyrim.ini',
+    'SkyrimPrefs.ini',
     ]
 
 #--INI setting to setup Save Profiles
-saveProfilesKey = (u'General',u'SLocalSavePath')
+saveProfilesKey = ('General','SLocalSavePath')
 
 #--The main plugin Wrye Bash should look for
 masterFiles = [
-    u'Skyrim.esm',
-    u'Update.esm',
+    'Skyrim.esm',
+    'Update.esm',
     ]
 
 #--BAIN: Directories that are OK to install to
 dataDirs = {
-    u'dialogueviews',
-    u'interface',
-    u'meshes',
-    u'strings',
-    u'textures',
-    u'video',
-    u'lodsettings',
-    u'grass',
-    u'scripts',
-    u'shadersfx',
-    u'music',
-    u'sound',
-    u'seq',
+    'dialogueviews',
+    'interface',
+    'meshes',
+    'strings',
+    'textures',
+    'video',
+    'lodsettings',
+    'grass',
+    'scripts',
+    'shadersfx',
+    'music',
+    'sound',
+    'seq',
 }
 dataDirsPlus = {
-    u'skse',
-    u'ini',
-    u'asi',
-    u'skyproc patchers',
-    u'calientetools', # bodyslide
-    u'dyndolod',
-    u'tools',
+    'skse',
+    'ini',
+    'asi',
+    'skyproc patchers',
+    'calientetools', # bodyslide
+    'dyndolod',
+    'tools',
 }
 
 #--Tags supported by this game
 allTags = sorted((
-    u'Deactivate', u'Delev', u'Invent', u'NoMerge', u'Relev',
+    'Deactivate', 'Delev', 'Invent', 'NoMerge', 'Relev',
     ))
 
 #--Gui patcher classes available when building a Bashed Patch
 patchers = (
-    u'GmstTweaker', u'ImportInventory', u'ListsMerger', u'PatchMerger',
+    'GmstTweaker', 'ImportInventory', 'ListsMerger', 'PatchMerger',
 )
 
 #--Plugin format stuff
@@ -154,9 +154,9 @@ class esp:
 
     #--Strings Files
     stringsFiles = [
-        ((u'Strings',), u'%(body)s_%(language)s.STRINGS'),
-        ((u'Strings',), u'%(body)s_%(language)s.DLSTRINGS'),
-        ((u'Strings',), u'%(body)s_%(language)s.ILSTRINGS'),
+        (('Strings',), '%(body)s_%(language)s.STRINGS'),
+        (('Strings',), '%(body)s_%(language)s.DLSTRINGS'),
+        (('Strings',), '%(body)s_%(language)s.ILSTRINGS'),
     ]
 
 #--Mergeable record types

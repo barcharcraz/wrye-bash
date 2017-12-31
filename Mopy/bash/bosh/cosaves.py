@@ -39,7 +39,7 @@ class CoSaveHeader(object):
     def __init__(self, ins, cosave_path, signature):
         self.signature = unpack_string(ins, len(signature))
         if self.signature != signature:
-            raise FileError(cosave_path, u'Signature wrong: %r (expected %r)' %
+            raise FileError(cosave_path, 'Signature wrong: %r (expected %r)' %
                 (self.signature, signature))
         self.formatVersion = unpack_int(ins)
         self.obseVersion = unpack_short(ins)
@@ -82,45 +82,45 @@ class _SEChunk(_Chunk):
             #--OBSE String
             modIndex, stringID, stringLength, = _unpack('=BIH', 7)
             stringData = decode(ins.read(stringLength))
-            log(u'    ' + _(u'Mod :') + u'  %02X (%s)' % (
+            log('    ' + _('Mod :') + '  %02X (%s)' % (
                 modIndex, save_masters[modIndex].s))
-            log(u'    ' + _(u'ID  :') + u'  %u' % stringID)
-            log(u'    ' + _(u'Data:') + u'  %s' % stringData)
+            log('    ' + _('ID  :') + '  %u' % stringID)
+            log('    ' + _('Data:') + '  %s' % stringData)
         elif chunkType == 'RVRA':
             #--OBSE Array
             modIndex, arrayID, keyType, isPacked, = _unpack('=BIBB', 7)
             if modIndex == 255:
-                log(_(u'    Mod :  %02X (Save File)') % modIndex)
+                log(_('    Mod :  %02X (Save File)') % modIndex)
             else:
-                log(_(u'    Mod :  %02X (%s)') % (
+                log(_('    Mod :  %02X (%s)') % (
                     modIndex, save_masters[modIndex].s))
-            log(_(u'    ID  :  %u') % arrayID)
+            log(_('    ID  :  %u') % arrayID)
             if keyType == 1: #Numeric
                 if isPacked:
-                    log(_(u'    Type:  Array'))
+                    log(_('    Type:  Array'))
                 else:
-                    log(_(u'    Type:  Map'))
+                    log(_('    Type:  Map'))
             elif keyType == 3:
-                log(_(u'    Type:  StringMap'))
+                log(_('    Type:  StringMap'))
             else:
-                log(_(u'    Type:  Unknown'))
+                log(_('    Type:  Unknown'))
             if self.chunkVersion >= 1:
                 numRefs, = _unpack('=I', 4)
                 if numRefs > 0:
-                    log(u'    Refs:')
+                    log('    Refs:')
                     for x in range(numRefs):
                         refModID, = _unpack('=B', 1)
                         if refModID == 255:
-                            log(_(u'      %02X (Save File)') % refModID)
+                            log(_('      %02X (Save File)') % refModID)
                         else:
-                            log(u'      %02X (%s)' % (
+                            log('      %02X (%s)' % (
                                 refModID, save_masters[refModID].s))
             numElements, = _unpack('=I', 4)
-            log(_(u'    Size:  %u') % numElements)
+            log(_('    Size:  %u') % numElements)
             for i in range(numElements):
                 if keyType == 1:
                     key, = _unpack('=d', 8)
-                    keyStr = u'%f' % key
+                    keyStr = '%f' % key
                 elif keyType == 3:
                     keyLen, = _unpack('=H', 2)
                     key = ins.read(keyLen)
@@ -130,19 +130,19 @@ class _SEChunk(_Chunk):
                 dataType, = _unpack('=B', 1)
                 if dataType == 1:
                     data, = _unpack('=d', 8)
-                    dataStr = u'%f' % data
+                    dataStr = '%f' % data
                 elif dataType == 2:
                     data, = _unpack('=I', 4)
-                    dataStr = u'%08X' % data
+                    dataStr = '%08X' % data
                 elif dataType == 3:
                     dataLen, = _unpack('=H', 2)
                     data = ins.read(dataLen)
                     dataStr = decode(data)
                 elif dataType == 4:
                     data, = _unpack('=I', 4)
-                    dataStr = u'%u' % data
-                log(u'    [%s]:%s = %s' % (keyStr, (
-                u'BAD', u'NUM', u'REF', u'STR', u'ARR')[dataType],
+                    dataStr = '%u' % data
+                log('    [%s]:%s = %s' % (keyStr, (
+                'BAD', 'NUM', 'REF', 'STR', 'ARR')[dataType],
                                            dataStr))
 
     def chunk_map_master(self, master_renames_dict, plugin_chunk):
@@ -175,94 +175,94 @@ class _PluggyChunk(_Chunk):
             return struct_unpack(fmt, ins.read(fmt_siz))
         if chunkTypeNum == 1:
             #--Pluggy TypeESP
-            log(_(u'    Pluggy ESPs'))
-            log(_(u'    EID   ID    Name'))
+            log(_('    Pluggy ESPs'))
+            log(_('    EID   ID    Name'))
             while ins.tell() < len(chunkBuff):
                 if chunkVersion == 2:
                     espId, modId, = _unpack('=BB', 2)
-                    log(u'    %02X    %02X' % (espId, modId))
+                    log('    %02X    %02X' % (espId, modId))
                     espMap[modId] = espId
                 else:  #elif chunkVersion == 1"
                     espId, modId, modNameLen, = _unpack('=BBI', 6)
                     modName = ins.read(modNameLen)
-                    log(u'    %02X    %02X    %s' % (espId, modId, modName))
+                    log('    %02X    %02X    %s' % (espId, modId, modName))
                     espMap[modId] = modName  # was [espId]
         elif chunkTypeNum == 2:
             #--Pluggy TypeSTR
-            log(_(u'    Pluggy String'))
+            log(_('    Pluggy String'))
             strId, modId, strFlags, = _unpack('=IBB', 6)
             strData = ins.read(len(chunkBuff) - ins.tell())
-            log(u'      ' + _(u'StrID :') + u' %u' % strId)
-            log(u'      ' + _(u'ModID :') + u' %02X %s' % (
-                modId, espMap[modId] if modId in espMap else u'ERROR',))
-            log(u'      ' + _(u'Flags :') + u' %u' % strFlags)
-            log(u'      ' + _(u'Data  :') + u' %s' % strData)
+            log('      ' + _('StrID :') + ' %u' % strId)
+            log('      ' + _('ModID :') + ' %02X %s' % (
+                modId, espMap[modId] if modId in espMap else 'ERROR',))
+            log('      ' + _('Flags :') + ' %u' % strFlags)
+            log('      ' + _('Data  :') + ' %s' % strData)
         elif chunkTypeNum == 3:
             #--Pluggy TypeArray
-            log(_(u'    Pluggy Array'))
+            log(_('    Pluggy Array'))
             arrId, modId, arrFlags, arrSize, = _unpack('=IBBI', 10)
-            log(_(u'      ArrID : %u') % (arrId,))
-            log(_(u'      ModID : %02X %s') % (
-                modId, espMap[modId] if modId in espMap else u'ERROR',))
-            log(_(u'      Flags : %u') % (arrFlags,))
-            log(_(u'      Size  : %u') % (arrSize,))
+            log(_('      ArrID : %u') % (arrId,))
+            log(_('      ModID : %02X %s') % (
+                modId, espMap[modId] if modId in espMap else 'ERROR',))
+            log(_('      Flags : %u') % (arrFlags,))
+            log(_('      Size  : %u') % (arrSize,))
             while ins.tell() < len(chunkBuff):
                 elemIdx, elemType, = _unpack('=IB', 5)
                 elemStr = ins.read(4)
                 if elemType == 0:  #--Integer
                     elem, = struct_unpack('=i', elemStr)
-                    log(u'        [%u]  INT  %d' % (elemIdx, elem,))
+                    log('        [%u]  INT  %d' % (elemIdx, elem,))
                 elif elemType == 1:  #--Ref
                     elem, = struct_unpack('=I', elemStr)
-                    log(u'        [%u]  REF  %08X' % (elemIdx, elem,))
+                    log('        [%u]  REF  %08X' % (elemIdx, elem,))
                 elif elemType == 2:  #--Float
                     elem, = struct_unpack('=f', elemStr)
-                    log(u'        [%u]  FLT  %08X' % (elemIdx, elem,))
+                    log('        [%u]  FLT  %08X' % (elemIdx, elem,))
         elif chunkTypeNum == 4:
             #--Pluggy TypeName
-            log(_(u'    Pluggy Name'))
+            log(_('    Pluggy Name'))
             refId, = _unpack('=I', 4)
             refName = ins.read(len(chunkBuff) - ins.tell())
-            newName = u''
+            newName = ''
             for c in refName:
                 ch = c if (c >= chr(0x20)) and (c < chr(0x80)) else '.'
                 newName = newName + ch
-            log(_(u'      RefID : %08X') % refId)
-            log(_(u'      Name  : %s') % decode(newName))
+            log(_('      RefID : %08X') % refId)
+            log(_('      Name  : %s') % decode(newName))
         elif chunkTypeNum == 5:
             #--Pluggy TypeScr
-            log(_(u'    Pluggy ScreenSize'))
+            log(_('    Pluggy ScreenSize'))
             #UNTESTED - uncomment following line to skip this record type
             #continue
             scrW, scrH, = _unpack('=II', 8)
-            log(_(u'      Width  : %u') % scrW)
-            log(_(u'      Height : %u') % scrH)
+            log(_('      Width  : %u') % scrW)
+            log(_('      Height : %u') % scrH)
         elif chunkTypeNum == 6:
             #--Pluggy TypeHudS
-            log(u'    ' + _(u'Pluggy HudS'))
+            log('    ' + _('Pluggy HudS'))
             #UNTESTED - uncomment following line to skip this record type
             #continue
             hudSid, modId, hudFlags, hudRootID, hudShow, hudPosX, hudPosY, \
             hudDepth, hudScaleX, hudScaleY, hudAlpha, hudAlignment, \
             hudAutoScale, = _unpack('=IBBBBffhffBBB', 29)
             hudFileName = decode(ins.read(len(chunkBuff) - ins.tell()))
-            log(u'      ' + _(u'HudSID :') + u' %u' % hudSid)
-            log(u'      ' + _(u'ModID  :') + u' %02X %s' % (
-                modId, espMap[modId] if modId in espMap else u'ERROR',))
-            log(u'      ' + _(u'Flags  :') + u' %02X' % hudFlags)
-            log(u'      ' + _(u'RootID :') + u' %u' % hudRootID)
-            log(u'      ' + _(u'Show   :') + u' %02X' % hudShow)
-            log(u'      ' + _(u'Pos    :') + u' %f,%f' % (hudPosX, hudPosY,))
-            log(u'      ' + _(u'Depth  :') + u' %u' % hudDepth)
-            log(u'      ' + _(u'Scale  :') + u' %f,%f' % (
+            log('      ' + _('HudSID :') + ' %u' % hudSid)
+            log('      ' + _('ModID  :') + ' %02X %s' % (
+                modId, espMap[modId] if modId in espMap else 'ERROR',))
+            log('      ' + _('Flags  :') + ' %02X' % hudFlags)
+            log('      ' + _('RootID :') + ' %u' % hudRootID)
+            log('      ' + _('Show   :') + ' %02X' % hudShow)
+            log('      ' + _('Pos    :') + ' %f,%f' % (hudPosX, hudPosY,))
+            log('      ' + _('Depth  :') + ' %u' % hudDepth)
+            log('      ' + _('Scale  :') + ' %f,%f' % (
                 hudScaleX, hudScaleY,))
-            log(u'      ' + _(u'Alpha  :') + u' %02X' % hudAlpha)
-            log(u'      ' + _(u'Align  :') + u' %02X' % hudAlignment)
-            log(u'      ' + _(u'AutoSc :') + u' %02X' % hudAutoScale)
-            log(u'      ' + _(u'File   :') + u' %s' % hudFileName)
+            log('      ' + _('Alpha  :') + ' %02X' % hudAlpha)
+            log('      ' + _('Align  :') + ' %02X' % hudAlignment)
+            log('      ' + _('AutoSc :') + ' %02X' % hudAutoScale)
+            log('      ' + _('File   :') + ' %s' % hudFileName)
         elif chunkTypeNum == 7:
             #--Pluggy TypeHudT
-            log(_(u'    Pluggy HudT'))
+            log(_('    Pluggy HudT'))
             #UNTESTED - uncomment following line to skip this record type
             #continue
             hudTid, modId, hudFlags, hudShow, hudPosX, hudPosY, hudDepth, \
@@ -274,29 +274,29 @@ class _PluggyChunk(_Chunk):
             hudFontHeight, hudFontWidth, hudWeight, hudItalic, hudFontR, \
             hudFontG, hudFontB, = _unpack('=IIhBBBB', 14)
             hudText = decode(ins.read(len(chunkBuff) - ins.tell()))
-            log(u'      ' + _(u'HudTID :') + u' %u' % hudTid)
-            log(u'      ' + _(u'ModID  :') + u' %02X %s' % (
-                modId, espMap[modId] if modId in espMap else u'ERROR',))
-            log(u'      ' + _(u'Flags  :') + u' %02X' % hudFlags)
-            log(u'      ' + _(u'Show   :') + u' %02X' % hudShow)
-            log(u'      ' + _(u'Pos    :') + u' %f,%f' % (hudPosX, hudPosY,))
-            log(u'      ' + _(u'Depth  :') + u' %u' % hudDepth)
-            log(u'      ' + _(u'Scale  :') + u' %f,%f' % (
+            log('      ' + _('HudTID :') + ' %u' % hudTid)
+            log('      ' + _('ModID  :') + ' %02X %s' % (
+                modId, espMap[modId] if modId in espMap else 'ERROR',))
+            log('      ' + _('Flags  :') + ' %02X' % hudFlags)
+            log('      ' + _('Show   :') + ' %02X' % hudShow)
+            log('      ' + _('Pos    :') + ' %f,%f' % (hudPosX, hudPosY,))
+            log('      ' + _('Depth  :') + ' %u' % hudDepth)
+            log('      ' + _('Scale  :') + ' %f,%f' % (
                 hudScaleX, hudScaleY,))
-            log(u'      ' + _(u'Alpha  :') + u' %02X' % hudAlpha)
-            log(u'      ' + _(u'Align  :') + u' %02X' % hudAlignment)
-            log(u'      ' + _(u'AutoSc :') + u' %02X' % hudAutoScale)
-            log(u'      ' + _(u'Width  :') + u' %u' % hudWidth)
-            log(u'      ' + _(u'Height :') + u' %u' % hudHeight)
-            log(u'      ' + _(u'Format :') + u' %u' % hudFormat)
-            log(u'      ' + _(u'FName  :') + u' %s' % hudFontName)
-            log(u'      ' + _(u'FHght  :') + u' %u' % hudFontHeight)
-            log(u'      ' + _(u'FWdth  :') + u' %u' % hudFontWidth)
-            log(u'      ' + _(u'FWeigh :') + u' %u' % hudWeight)
-            log(u'      ' + _(u'FItal  :') + u' %u' % hudItalic)
-            log(u'      ' + _(u'FRGB   :') + u' %u,%u,%u' % (
+            log('      ' + _('Alpha  :') + ' %02X' % hudAlpha)
+            log('      ' + _('Align  :') + ' %02X' % hudAlignment)
+            log('      ' + _('AutoSc :') + ' %02X' % hudAutoScale)
+            log('      ' + _('Width  :') + ' %u' % hudWidth)
+            log('      ' + _('Height :') + ' %u' % hudHeight)
+            log('      ' + _('Format :') + ' %u' % hudFormat)
+            log('      ' + _('FName  :') + ' %s' % hudFontName)
+            log('      ' + _('FHght  :') + ' %u' % hudFontHeight)
+            log('      ' + _('FWdth  :') + ' %u' % hudFontWidth)
+            log('      ' + _('FWeigh :') + ' %u' % hudWeight)
+            log('      ' + _('FItal  :') + ' %u' % hudItalic)
+            log('      ' + _('FRGB   :') + ' %u,%u,%u' % (
                 hudFontR, hudFontG, hudFontB,))
-            log(u'      ' + _(u'FText  :') + u' %s' % hudText)
+            log('      ' + _('FText  :') + ' %s' % hudText)
 
     def chunk_map_master(self, master_renames_dict, plugin_chunk):
         chunkTypeNum, = struct_unpack('=I', self.chunkType)
@@ -332,7 +332,7 @@ class _PluginChunk(object):
         self.plugin_chunks = []
         chunk_type = self._get_plugin_chunk_type(xse_signature,
                                                  pluggy_signature)
-        for x in xrange(self.num_plugin_chunks):
+        for x in range(self.num_plugin_chunks):
             self.plugin_chunks.append(chunk_type(ins))
 
     def _get_plugin_chunk_type(self, xse_signature, pluggy_signature):
@@ -349,10 +349,10 @@ class ACoSaveFile(object):
     def __init__(self, cosave_path):
         # super(ACoSaveFile, self).__init__(cosave_path)
         self.cosave_path = cosave_path
-        with open(u'%s' % cosave_path, 'rb') as ins:
+        with open('%s' % cosave_path, 'rb') as ins:
             self.cosave_header = CoSaveHeader(ins, cosave_path, self.signature)
             self.plugin_chunks = []
-            for x in xrange(self.cosave_header.numPlugins):
+            for x in range(self.cosave_header.numPlugins):
                 self.plugin_chunks.append(_PluginChunk(
                     ins, self._xse_signature, self._pluggy_signature))
 
@@ -364,27 +364,27 @@ class ACoSaveFile(object):
     def logStatObse(self, log, save_masters):
         """Print stats to log."""
         #--Header
-        log.setHeader(_(u'Header'))
-        log(u'=' * 80)
-        log(_(u'  Format version:   %08X') % (self.cosave_header.formatVersion,))
-        log(_(u'  OBSE version:     %u.%u') % (self.cosave_header.obseVersion,self.cosave_header.obseMinorVersion,))
-        log(_(u'  Oblivion version: %08X') % (self.cosave_header.oblivionVersion,))
+        log.setHeader(_('Header'))
+        log('=' * 80)
+        log(_('  Format version:   %08X') % (self.cosave_header.formatVersion,))
+        log(_('  OBSE version:     %u.%u') % (self.cosave_header.obseVersion,self.cosave_header.obseMinorVersion,))
+        log(_('  Oblivion version: %08X') % (self.cosave_header.oblivionVersion,))
         #--Plugins
         for plugin_ch in self.plugin_chunks: # type: _PluginChunk
             plugin_sig = plugin_ch.plugin_signature
-            log.setHeader(_(u'Plugin opcode=%08X chunkNum=%u') % (
+            log.setHeader(_('Plugin opcode=%08X chunkNum=%u') % (
                 plugin_sig, plugin_ch.num_plugin_chunks,))
-            log(u'=' * 80)
-            log(_(u'  Type  Ver   Size'))
-            log(u'-' * 80)
+            log('=' * 80)
+            log(_('  Type  Ver   Size'))
+            log('-' * 80)
             espMap = {}
             for ch in plugin_ch.plugin_chunks: # type: _Chunk
                 chunkTypeNum, = struct_unpack('=I',ch.chunkType)
                 if ch.chunkType[0] >= ' ' and ch.chunkType[3] >= ' ': # HUH ?
-                    log(u'  %4s  %-4u  %08X' % (
+                    log('  %4s  %-4u  %08X' % (
                         ch.chunkType, ch.chunkVersion, ch.chunkLength))
                 else:
-                    log(u'  %04X  %-4u  %08X' % (
+                    log('  %04X  %-4u  %08X' % (
                         chunkTypeNum, ch.chunkVersion, ch.chunkLength))
                 with sio(ch.chunkData) as ins:
                     ch.log_chunk(log, ins, save_masters, espMap)
@@ -437,12 +437,12 @@ class F4seCosave(SkseCosave):
 # Factory
 def get_cosave_type(game_fsName):
     """:rtype: type"""
-    if game_fsName == u'Oblivion':
+    if game_fsName == 'Oblivion':
         return ObseCosave
-    elif game_fsName == u'Skyrim':
+    elif game_fsName == 'Skyrim':
         return SkseCosave
-    elif game_fsName == u'Skyrim Special Edition':
+    elif game_fsName == 'Skyrim Special Edition':
         return SkseSECosave
-    elif game_fsName == u'Fallout4':
+    elif game_fsName == 'Fallout4':
         return F4seCosave
     return None

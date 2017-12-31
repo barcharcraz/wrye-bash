@@ -32,7 +32,7 @@ from ..brec import getModIndex, MreRecord, genFid, ModReader
 
 class PCFaces:
     """Package: Objects and functions for working with face data."""
-    flags = Flags(0L,Flags.getNames('name','race','gender','hair','eye','iclass','stats','factions','modifiers','spells'))
+    flags = Flags(0,Flags.getNames('name','race','gender','hair','eye','iclass','stats','factions','modifiers','spells'))
 
     class PCFace(object):
         """Represents a face."""
@@ -41,7 +41,7 @@ class PCFaces:
             'skills','health','unused2','baseSpell','fatigue','iclass','factions','modifiers','spells')
         def __init__(self):
             self.masters = []
-            self.eid = self.pcName = u'generic'
+            self.eid = self.pcName = 'generic'
             self.fggs_p = self.fgts_p = '\x00'*4*50
             self.fgga_p = '\x00'*4*30
             self.unused2 = bass.null2
@@ -52,15 +52,15 @@ class PCFaces:
             self.spells = []
 
         def getGenderName(self):
-            return self.gender and u'Female' or u'Male'
+            return self.gender and 'Female' or 'Male'
 
         def getRaceName(self):
-            return bush.game.raceNames.get(self.race,_(u'Unknown'))
+            return bush.game.raceNames.get(self.race,_('Unknown'))
 
         def convertRace(self,fromRace,toRace):
             """Converts face from one race to another while preserving structure, etc."""
             for attr,num in (('fggs_p',50),('fgga_p',30),('fgts_p',50)):
-                format = unicode(num)+u'f'
+                format = str(num)+'f'
                 sValues = list(struct_unpack(format,getattr(self, attr)))
                 fValues = list(struct_unpack(format,getattr(fromRace, attr)))
                 tValues = list(struct_unpack(format,getattr(toRace, attr)))
@@ -74,13 +74,13 @@ class PCFaces:
         """Safely finds position of name within save ACHR data."""
         namePos = data.find(pcName)
         if namePos == -1:
-            raise SaveFileError(saveName,u'Failed to find pcName in PC ACHR record.')
+            raise SaveFileError(saveName,'Failed to find pcName in PC ACHR record.')
         namePos2 = data.find(pcName,namePos+1)
         if namePos2 != -1:
             raise SaveFileError(saveName,
-                u'Uncertain about position of face data, probably because '
-                u'player character name is too short. Try renaming player '
-                u'character in save game.')
+                'Uncertain about position of face data, probably because '
+                'player character name is too short. Try renaming player '
+                'character in save game.')
         return namePos
 
     # Save Get ----------------------------------------------------------------
@@ -191,7 +191,7 @@ class PCFaces:
 
     # Save Set ----------------------------------------------------------------
     @staticmethod
-    def save_setFace(saveInfo,face,flags=0L):
+    def save_setFace(saveInfo,face,flags=0):
         """DEPRECATED. Write a pcFace to a save file."""
         saveFile = SaveFile(saveInfo)
         saveFile.load()
@@ -210,9 +210,9 @@ class PCFaces:
                 saveFile.created[index] = npc
                 break
         else:
-            raise StateError(u"Record %08X not found in %s." % (targetid,saveFile.fileInfo.name.s))
+            raise StateError("Record %08X not found in %s." % (targetid,saveFile.fileInfo.name.s))
         if npc.recType != 'NPC_':
-            raise StateError(u"Record %08X in %s is not an NPC." % (targetid,saveFile.fileInfo.name.s))
+            raise StateError("Record %08X in %s is not an NPC." % (targetid,saveFile.fileInfo.name.s))
         #--Update masters
         for fid in (face.race, face.eye, face.hair):
             if not fid: continue
@@ -266,7 +266,7 @@ class PCFaces:
         saveFile.setRecord(npc.getTuple(fid,version))
 
     @staticmethod
-    def save_setPlayerFace(saveFile,face,flags=0L,morphFacts=None):
+    def save_setPlayerFace(saveFile,face,flags=0,morphFacts=None):
         """Write a pcFace to a save file."""
         flags = PCFaces.flags(flags)
         #--Update masters
@@ -437,17 +437,17 @@ class PCFaces:
         #--Tes4
         tes4 = modFile.tes4
         if not tes4.author:
-            tes4.author = u'[wb]'
+            tes4.author = '[wb]'
         if not tes4.description:
-            tes4.description = _(u'Face dump from save game.')
+            tes4.description = _('Face dump from save game.')
         from . import modInfos ##: put it here so I know it's initialized...
         if modInfos.masterName not in tes4.masters:
             tes4.masters.append(modInfos.masterName)
         masterMap = MasterMap(face.masters,tes4.masters+[modInfo.name])
         #--Eid
         npcEids = set([record.eid for record in modFile.NPC_.records])
-        eidForm = u''.join((u"sg", bush.game.raceShortNames.get(face.race,u'Unk'),
-            (face.gender and u'a' or u'u'), re.sub(ur'\W',u'',face.pcName),u'%02d'))
+        eidForm = ''.join(("sg", bush.game.raceShortNames.get(face.race,'Unk'),
+            (face.gender and 'a' or 'u'), re.sub(r'\W','',face.pcName),'%02d'))
         count,eid = 0, eidForm % 0
         while eid in npcEids:
             count += 1

@@ -146,7 +146,7 @@ if __name__ == "__main__":
         elif '9' == char: nine(_lines)
         elif '0' == char: zero(_lines)
         elif '.' == char: dot(_lines)
-        else: print "unhandled character: '%s'" % char
+        else: print("unhandled character: '%s'" % char)
 
     for line in _lines:
-        print line.rstrip()
+        print(line.rstrip())

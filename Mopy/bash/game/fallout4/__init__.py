@@ -32,52 +32,52 @@ from ... import brec
 from ...bolt import struct_pack, struct_unpack
 
 #--Name of the game to use in UI.
-displayName = u'Fallout 4'
+displayName = 'Fallout 4'
 #--Name of the game's filesystem folder.
-fsName = u'Fallout4'
+fsName = 'Fallout4'
 #--Alternate display name to use instead of "Wrye Bash for ***"
-altName = u'Wrye Flash'
+altName = 'Wrye Flash'
 #--Name of game's default ini file.
-defaultIniFile = u'Fallout4_default.ini'
+defaultIniFile = 'Fallout4_default.ini'
 
 #--Exe to look for to see if this is the right game
-exe = u'Fallout4.exe'
+exe = 'Fallout4.exe'
 
 #--Registry keys to read to find the install location
-regInstallKeys = (u'Bethesda Softworks\\Fallout4', u'Installed Path')
+regInstallKeys = ('Bethesda Softworks\\Fallout4', 'Installed Path')
 
 #--patch information
 ## URL to download patches for the main game.
 # Update via steam
-patchURL = u''
-patchTip = u'Update via Steam'
+patchURL = ''
+patchTip = 'Update via Steam'
 
 #--URL to the Nexus site for this game
-nexusUrl = u'http://www.nexusmods.com/fallout4/'
-nexusName = u'Fallout 4 Nexus'
+nexusUrl = 'http://www.nexusmods.com/fallout4/'
+nexusName = 'Fallout 4 Nexus'
 nexusKey = 'bash.installers.openFallout4Nexus.continue'
 
 # Bsa info
 allow_reset_bsa_timestamps = False
-bsa_extension = ur'ba2'
+bsa_extension = r'ba2'
 supports_mod_inis = True
 vanilla_string_bsas = {
-    u'fallout4.esm': [u'Fallout4 - Interface.ba2'],
-    u'dlcrobot.esm': [u'DLCRobot - Main.ba2'],
-    u'dlcworkshop01.esm': [u'DLCworkshop01 - Main.ba2'],
-    u'dlcworkshop02.esm': [u'DLCworkshop02 - Main.ba2'],
-    u'dlcworkshop03.esm': [u'DLCworkshop03 - Main.ba2'],
-    u'dlccoast.esm': [u'DLCCoast - Main.ba2'],
-    u'dlcnukaworld.esm':  [u'DLCNukaWorld - Main.ba2'],
+    'fallout4.esm': ['Fallout4 - Interface.ba2'],
+    'dlcrobot.esm': ['DLCRobot - Main.ba2'],
+    'dlcworkshop01.esm': ['DLCworkshop01 - Main.ba2'],
+    'dlcworkshop02.esm': ['DLCworkshop02 - Main.ba2'],
+    'dlcworkshop03.esm': ['DLCworkshop03 - Main.ba2'],
+    'dlccoast.esm': ['DLCCoast - Main.ba2'],
+    'dlcnukaworld.esm':  ['DLCNukaWorld - Main.ba2'],
 }
 resource_archives_keys = (
-    u'sResourceIndexFileList', u'sResourceStartUpArchiveList',
-    u'sResourceArchiveList', u'sResourceArchiveList2',
-    u'sResourceArchiveListBeta'
+    'sResourceIndexFileList', 'sResourceStartUpArchiveList',
+    'sResourceArchiveList', 'sResourceArchiveList2',
+    'sResourceArchiveListBeta'
 )
 
 # plugin extensions
-espm_extensions = {u'.esp', u'.esm', u'.esl'}
+espm_extensions = {'.esp', '.esm', '.esl'}
 
 # Load order info
 using_txt_file = True
@@ -86,57 +86,57 @@ using_txt_file = True
 class cs:
     ## TODO:  When the Fallout 4 Creation Kit is actually released, double check
     ## that the filename is correct, and create an actual icon
-    shortName = u'FO4CK'                 # Abbreviated name
-    longName = u'Creation Kit'           # Full name
-    exe = u'CreationKit.exe'             # Executable to run
+    shortName = 'FO4CK'                 # Abbreviated name
+    longName = 'Creation Kit'           # Full name
+    exe = 'CreationKit.exe'             # Executable to run
     seArgs = None                        # u'-editor'
-    imageName = u'creationkit%s.png'     # Image name template for the status bar
+    imageName = 'creationkit%s.png'     # Image name template for the status bar
 
 #--Script Extender information
 class se:
-    shortName = u'F4SE'                      # Abbreviated name
-    longName = u'Fallout 4 Script Extender'  # Full name
-    exe = u'f4se_loader.exe'                 # Exe to run
-    steamExe = u'f4se_steam_loader.dll'      # Exe to run if a steam install
-    url = u'http://f4se.silverlock.org/'     # URL to download from
-    urlTip = u'http://f4se.silverlock.org/'  # Tooltip for mouse over the URL
+    shortName = 'F4SE'                      # Abbreviated name
+    longName = 'Fallout 4 Script Extender'  # Full name
+    exe = 'f4se_loader.exe'                 # Exe to run
+    steamExe = 'f4se_steam_loader.dll'      # Exe to run if a steam install
+    url = 'http://f4se.silverlock.org/'     # URL to download from
+    urlTip = 'http://f4se.silverlock.org/'  # Tooltip for mouse over the URL
 
 #--Script Dragon
 class sd:
-    shortName = u''
-    longName = u''
-    installDir = u''
+    shortName = ''
+    longName = ''
+    installDir = ''
 
 #--SkyProc Patchers
 class sp:
-    shortName = u''
-    longName = u''
-    installDir = u''
+    shortName = ''
+    longName = ''
+    installDir = ''
 
 #--Quick shortcut for combining the SE and SD names
 se_sd = se.shortName
 
 #--Graphics Extender information
 class ge:
-    shortName = u''
-    longName = u''
+    shortName = ''
+    longName = ''
     ## exe is treated specially here.  If it is a string, then it should
     ## be the path relative to the root directory of the game
     ## if it is list, each list element should be an iterable to pass to Path.join
     ## relative to the root directory of the game.  In this case, each filename
     ## will be tested in reverse order.  This was required for Oblivion, as the newer
     ## OBGE has a different filename than the older OBGE
-    exe = u'**DNE**'
-    url = u''
-    urlTip = u''
+    exe = '**DNE**'
+    url = ''
+    urlTip = ''
 
 #--4gb Launcher
 class laa:
     # Skyrim has a 4gb Launcher, but as of patch 1.3.10, it is
     # no longer required (Bethsoft updated TESV.exe to already
     # be LAA)
-    name = u''
-    exe = u'**DNE**'       # Executable to run
+    name = ''
+    exe = '**DNE**'       # Executable to run
     launchesSE = False
 
 # Files BAIN shouldn't skip
@@ -153,7 +153,7 @@ dontSkipDirs = {
 #Folders BAIN should never check
 SkipBAINRefresh = {
     #Use lowercase names
-    u'fo4edit backups',
+    'fo4edit backups',
 }
 
 #--Some stuff dealing with INI files
@@ -163,90 +163,90 @@ class ini:
     allowNewLines = True
 
     #--INI Entry to enable BSA Redirection
-    bsaRedirection = (u'',u'')
+    bsaRedirection = ('','')
 
 #--Save Game format stuff
 class ess:
     # Save file capabilities
     canReadBasic = True         # All the basic stuff needed for the Saves Tab
     canEditMore = False         # No advanced editing
-    ext = u'.fos'               # Save file extension
+    ext = '.fos'               # Save file extension
 
 #--INI files that should show up in the INI Edits tab
 iniFiles = [
-    u'Fallout4.ini',
-    u'Fallout4Prefs.ini',
-    u'Fallout4Custom.ini',
+    'Fallout4.ini',
+    'Fallout4Prefs.ini',
+    'Fallout4Custom.ini',
     ]
 
 #--INI setting to setup Save Profiles
-saveProfilesKey = (u'General',u'SLocalSavePath')
+saveProfilesKey = ('General','SLocalSavePath')
 
 #--The main plugin Wrye Bash should look for
 masterFiles = [
-    u'Fallout4.esm',
+    'Fallout4.esm',
     ]
 
 #The pickle file for this game. Holds encoded GMST IDs from the big list below.
-pklfile = ur'bash\db\Fallout4_ids.pkl'
+pklfile = r'bash\db\Fallout4_ids.pkl'
 
 #--BAIN: Directories that are OK to install to
 dataDirs = {
-    u'interface',
-    u'lodsettings',
-    u'materials',
-    u'meshes',
-    u'misc',
-    u'music',
-    u'programs',
-    u'scripts',
-    u'seq',
-    u'shadersfx',
-    u'sound',
-    u'strings',
-    u'textures',
-    u'video',
-    u'vis',
+    'interface',
+    'lodsettings',
+    'materials',
+    'meshes',
+    'misc',
+    'music',
+    'programs',
+    'scripts',
+    'seq',
+    'shadersfx',
+    'sound',
+    'strings',
+    'textures',
+    'video',
+    'vis',
 }
 dataDirsPlus = {
-    u'f4se',
-    u'ini',
-    u'tools', # bodyslide
-    u'mcm',   # FO4 MCM
+    'f4se',
+    'ini',
+    'tools', # bodyslide
+    'mcm',   # FO4 MCM
 }
 
 # Installer -------------------------------------------------------------------
 # ensure all path strings are prefixed with 'r' to avoid interpretation of
 #   accidental escape sequences
 wryeBashDataFiles = {
-    u'Bashed Patch.esp',
-    u'Bashed Patch, 0.esp',
-    u'Bashed Patch, 1.esp',
-    u'Bashed Patch, 2.esp',
-    u'Bashed Patch, 3.esp',
-    u'Bashed Patch, 4.esp',
-    u'Bashed Patch, 5.esp',
-    u'Bashed Patch, 6.esp',
-    u'Bashed Patch, 7.esp',
-    u'Bashed Patch, 8.esp',
-    u'Bashed Patch, 9.esp',
-    u'Bashed Patch, CBash.esp',
-    u'Bashed Patch, Python.esp',
-    u'Bashed Patch, Warrior.esp',
-    u'Bashed Patch, Thief.esp',
-    u'Bashed Patch, Mage.esp',
-    u'Bashed Patch, Test.esp',
-    u'Docs\\Bash Readme Template.html',
-    u'Docs\\wtxt_sand_small.css',
-    u'Docs\\wtxt_teal.css',
-    u'Docs\\Bash Readme Template.txt',
-    u'Docs\\Bashed Patch, 0.html',
-    u'Docs\\Bashed Patch, 0.txt',
+    'Bashed Patch.esp',
+    'Bashed Patch, 0.esp',
+    'Bashed Patch, 1.esp',
+    'Bashed Patch, 2.esp',
+    'Bashed Patch, 3.esp',
+    'Bashed Patch, 4.esp',
+    'Bashed Patch, 5.esp',
+    'Bashed Patch, 6.esp',
+    'Bashed Patch, 7.esp',
+    'Bashed Patch, 8.esp',
+    'Bashed Patch, 9.esp',
+    'Bashed Patch, CBash.esp',
+    'Bashed Patch, Python.esp',
+    'Bashed Patch, Warrior.esp',
+    'Bashed Patch, Thief.esp',
+    'Bashed Patch, Mage.esp',
+    'Bashed Patch, Test.esp',
+    'Docs\\Bash Readme Template.html',
+    'Docs\\wtxt_sand_small.css',
+    'Docs\\wtxt_teal.css',
+    'Docs\\Bash Readme Template.txt',
+    'Docs\\Bashed Patch, 0.html',
+    'Docs\\Bashed Patch, 0.txt',
 }
 
 wryeBashDataDirs = {
-    u'Bash Patches',
-    u'INI Tweaks'
+    'Bash Patches',
+    'INI Tweaks'
 }
 
 ignoreDataFiles = set()
@@ -255,12 +255,12 @@ ignoreDataDirs = set()
 
 #--Tags supported by this game
 allTags = sorted((
-    u'Delev', u'NoMerge', u'Relev',
+    'Delev', 'NoMerge', 'Relev',
     ))
 
 #--Gui patcher classes available when building a Bashed Patch
 patchers = (
-    u'ListsMerger',
+    'ListsMerger',
     )
 
 #--CBash Gui patcher classes available when building a Bashed Patch
@@ -287,9 +287,9 @@ class esp:
 
     #--Strings Files
     stringsFiles = [
-        ((u'Strings',), u'%(body)s_%(language)s.STRINGS'),
-        ((u'Strings',), u'%(body)s_%(language)s.DLSTRINGS'),
-        ((u'Strings',), u'%(body)s_%(language)s.ILSTRINGS'),
+        (('Strings',), '%(body)s_%(language)s.STRINGS'),
+        (('Strings',), '%(body)s_%(language)s.DLSTRINGS'),
+        (('Strings',), '%(body)s_%(language)s.ILSTRINGS'),
     ]
 
 #------------------------------------------------------------------------------

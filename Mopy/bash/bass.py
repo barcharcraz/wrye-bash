@@ -25,11 +25,11 @@
 """This module just stores some data that all modules have to be able to access
 without worrying about circular imports. Currently used to expose layout
 and environment issues - do not modify or imitate (ut)."""
-import ConfigParser as _cp
+import configparser as _cp
 import os as _os
 
 language = None
-AppVersion = u"307" # must represent a valid float
+AppVersion = "307" # must represent a valid float
 __bashIni = None
 
 #--Null strings (for default empty byte arrays)
@@ -39,7 +39,7 @@ null3 = null1*3
 null4 = null1*4
 
 def GetBashIni(iniPath=None, reload_=False): ##: needs work
-    iniPath = iniPath or u'bash.ini'
+    iniPath = iniPath or 'bash.ini'
     global __bashIni
     if reload_ or __bashIni is None:
         if _os.path.exists(iniPath):
@@ -75,14 +75,14 @@ def rmTempDir():
     try:
         _tempDir.rmtree(safety=_tempDir.stail)
     except OSError:
-        from bolt import deprint
-        deprint(u'Failed to remove %s' % _tempDir, traceback=True)
+        from .bolt import deprint
+        deprint('Failed to remove %s' % _tempDir, traceback=True)
     _tempDir = None
 
 def newTempDir():
     """Generate a new temporary directory name, set it as the current Temp
     Dir."""
     global _tempDir
-    from bolt import Path
+    from .bolt import Path
     _tempDir = Path.tempDir()
     return _tempDir

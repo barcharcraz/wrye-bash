@@ -45,7 +45,7 @@ from ..parsers import LoadFactory, ModFile
 class SreNPC(object):
     """NPC change record."""
     __slots__ = ('form','health','unused2','attributes','acbs','spells','factions','full','ai','skills','modifiers')
-    flags = Flags(0L,Flags.getNames(
+    flags = Flags(0,Flags.getNames(
         (0,'form'),
         (2,'health'),
         (3,'attributes'),
@@ -174,45 +174,45 @@ class SreNPC(object):
         with sio() as buff:
             fids = saveFile.fids
             if self.form is not None:
-                buff.write(u'Form:\n  %d' % self.form)
+                buff.write('Form:\n  %d' % self.form)
             if self.attributes is not None:
                 buff.write(
-                    u'Attributes\n  strength %3d\n  intelligence %3d\n  '
-                    u'willpower %3d\n  agility %3d\n  speed %3d\n  endurance '
-                    u'%3d\n  personality %3d\n  luck %3d\n' % tuple(
+                    'Attributes\n  strength %3d\n  intelligence %3d\n  '
+                    'willpower %3d\n  agility %3d\n  speed %3d\n  endurance '
+                    '%3d\n  personality %3d\n  luck %3d\n' % tuple(
                         self.attributes))
             if self.acbs is not None:
-                buff.write(u'ACBS:\n')
+                buff.write('ACBS:\n')
                 for attr in SreNPC.ACBS.__slots__:
-                    buff.write(u'  %s %s\n' % (attr,getattr(self.acbs,attr)))
+                    buff.write('  %s %s\n' % (attr,getattr(self.acbs,attr)))
             if self.factions is not None:
-                buff.write(u'Factions:\n')
+                buff.write('Factions:\n')
                 for faction in self.factions:
-                    buff.write(u'  %8X %2X\n' % (fids[faction[0]],faction[1]))
+                    buff.write('  %8X %2X\n' % (fids[faction[0]],faction[1]))
             if self.spells is not None:
-                buff.write(u'Spells:\n')
+                buff.write('Spells:\n')
                 for spell in self.spells:
-                    buff.write(u'  %8X\n' % fids[spell])
+                    buff.write('  %8X\n' % fids[spell])
             if self.ai is not None:
-                buff.write(_(u'AI')+u':\n  ' + self.ai + u'\n')
+                buff.write(_('AI')+':\n  ' + self.ai + '\n')
             if self.health is not None:
-                buff.write(u'Health\n  %s\n' % self.health)
-                buff.write(u'Unused2\n  %s\n' % self.unused2)
+                buff.write('Health\n  %s\n' % self.health)
+                buff.write('Unused2\n  %s\n' % self.unused2)
             if self.modifiers is not None:
-                buff.write(u'Modifiers:\n')
+                buff.write('Modifiers:\n')
                 for modifier in self.modifiers:
-                    buff.write(u'  %s\n' % modifier)
+                    buff.write('  %s\n' % modifier)
             if self.full is not None:
-                buff.write(u'Full:\n  %s\n' % self.full)
+                buff.write('Full:\n  %s\n' % self.full)
             if self.skills is not None:
                 buff.write(
-                    u'Skills:\n  armorer %3d\n  athletics %3d\n  blade %3d\n '
-                    u' block %3d\n  blunt %3d\n  handToHand %3d\n  '
-                    u'heavyArmor %3d\n  alchemy %3d\n  alteration %3d\n  '
-                    u'conjuration %3d\n  destruction %3d\n  illusion %3d\n  '
-                    u'mysticism %3d\n  restoration %3d\n  acrobatics %3d\n  '
-                    u'lightArmor %3d\n  marksman %3d\n  mercantile %3d\n  '
-                    u'security %3d\n  sneak %3d\n  speechcraft  %3d\n' % tuple(
+                    'Skills:\n  armorer %3d\n  athletics %3d\n  blade %3d\n '
+                    ' block %3d\n  blunt %3d\n  handToHand %3d\n  '
+                    'heavyArmor %3d\n  alchemy %3d\n  alteration %3d\n  '
+                    'conjuration %3d\n  destruction %3d\n  illusion %3d\n  '
+                    'mysticism %3d\n  restoration %3d\n  acrobatics %3d\n  '
+                    'lightArmor %3d\n  marksman %3d\n  mercantile %3d\n  '
+                    'security %3d\n  sneak %3d\n  speechcraft  %3d\n' % tuple(
                         self.skills))
             return buff.getvalue()
 
@@ -231,7 +231,7 @@ class PluggyFile:
     def mapMasters(self,masterMap):
         """Update plugin names according to masterMap."""
         if not self.valid:
-            raise FileError(self.path.tail, u"File not initialized.")
+            raise FileError(self.path.tail, "File not initialized.")
         self._plugins = [(x, y, masterMap.get(z,z)) for x,y,z in self._plugins]
 
     def load(self):
@@ -244,25 +244,25 @@ class PluggyFile:
         crcNew = binascii.crc32(buff)
         if crc32 != crcNew:
             raise FileError(self.path.tail,
-                            u'CRC32 file check failed. File: %X, Calc: %X' % (
+                            'CRC32 file check failed. File: %X, Calc: %X' % (
                                 crc32, crcNew))
         #--Header
         with sio(buff) as ins:
             def _unpack(fmt, fmt_siz):
                 return struct_unpack(fmt, ins.read(fmt_siz))
             if ins.read(10) != 'PluggySave':
-                raise FileError(self.path.tail, u'File tag != "PluggySave"')
+                raise FileError(self.path.tail, 'File tag != "PluggySave"')
             self.version, = _unpack('I',4)
             #--Reject versions earlier than 1.02
             if self.version < 0x01020000:
                 raise FileError(self.path.tail,
-                                u'Unsupported file version: %X' % self.version)
+                                'Unsupported file version: %X' % self.version)
             #--Plugins
             self._plugins = []
             type, = _unpack('=B',1)
             if type != 0:
                 raise FileError(self.path.tail,
-                                u'Expected plugins record, but got %d.' % type)
+                                'Expected plugins record, but got %d.' % type)
             count, = _unpack('=I',4)
             for x in range(count):
                 espid,index,modLen = _unpack('=2BI',6)
@@ -278,7 +278,7 @@ class PluggyFile:
         """Saves."""
         import binascii
         if not self.valid:
-            raise FileError(self.path.tail, u"File not initialized.")
+            raise FileError(self.path.tail, "File not initialized.")
         #--Buffer
         with sio() as buff:
             #--Save
@@ -315,7 +315,7 @@ class PluggyFile:
 # Save File -------------------------------------------------------------------
 class SaveFile:
     """Represents a Tes4 Save file."""
-    recordFlags = Flags(0L,Flags.getNames(
+    recordFlags = Flags(0,Flags.getNames(
         'form','baseid','moved','havocMoved','scale','allExtra','lock','owner','unk8','unk9',
         'mapMarkerFlags','hadHavokMoveFlag','unk12','unk13','unk14','unk15',
         'emptyFlag','droppedItem','doorDefaultState','doorState','teleport',
@@ -356,7 +356,7 @@ class SaveFile:
             progress = progress or bolt.Progress()
             progress.setFull(self.fileInfo.size)
             #--Header
-            progress(0,_(u'Reading Header.'))
+            progress(0,_('Reading Header.'))
             self.header = ins.read(34)
 
             #--Save Header, pcName
@@ -382,7 +382,7 @@ class SaveFile:
             self.preGlobals = ins.read(8*4)
             #--Globals
             globalsNum = unpack_short(ins)
-            self.globals = [unpack_many(ins, 'If') for num in xrange(globalsNum)]
+            self.globals = [unpack_many(ins, 'If') for num in range(globalsNum)]
             #--Pre-Created (Class, processes, spectator, sky)
             with sio() as buff:
                 for count in range(4):
@@ -393,8 +393,8 @@ class SaveFile:
             #--Created (ALCH,SPEL,ENCH,WEAP,CLOTH,ARMO, etc.?)
             modReader = ModReader(self.fileInfo.name,ins)
             createdNum = unpack_int(ins)
-            for count in xrange(createdNum):
-                progress(ins.tell(),_(u'Reading created...'))
+            for count in range(createdNum):
+                progress(ins.tell(),_('Reading created...'))
                 header = unpack_many(ins, '4s4I')
                 self.created.append(MreRecord(ModReader.recHeader(*header),modReader))
             #--Pre-records: Quickkeys, reticule, interface, regions
@@ -405,14 +405,14 @@ class SaveFile:
                 self.preRecords = buff.getvalue()
 
             #--Records
-            for count in xrange(recordsNum):
-                progress(ins.tell(),_(u'Reading records...'))
+            for count in range(recordsNum):
+                progress(ins.tell(),_('Reading records...'))
                 (fid, recType, flags, version, siz) = unpack_many(ins,'=IBIBH')
                 data = ins.read(siz)
                 self.records.append((fid,recType,flags,version,data))
 
             #--Temp Effects, fids, worldids
-            progress(ins.tell(),_(u'Reading fids, worldids...'))
+            progress(ins.tell(),_('Reading fids, worldids...'))
             tmp_effects_size = unpack_int(ins)
             self.tempEffects = ins.read(tmp_effects_size)
             #--Fids
@@ -427,12 +427,12 @@ class SaveFile:
             self.worldSpaces = array.array('I')
             self.worldSpaces.fromfile(ins,num)
         #--Done
-        progress(progress.full,_(u'Finished reading.'))
+        progress(progress.full,_('Finished reading.'))
 
     def save(self,outPath=None,progress=None):
         """Save data to file.
         outPath -- Path of the output file to write to. Defaults to original file path."""
-        if not self.canSave: raise StateError(u"Insufficient data to write file.")
+        if not self.canSave: raise StateError("Insufficient data to write file.")
         outPath = outPath or self.fileInfo.getPath()
         with outPath.open('wb') as out:
             def _pack(fmt, *data):
@@ -441,7 +441,7 @@ class SaveFile:
             progress = progress or bolt.Progress()
             progress.setFull(self.fileInfo.size)
             #--Header
-            progress(0,_(u'Writing Header.'))
+            progress(0,_('Writing Header.'))
             out.write(self.header)
             #--Save Header
             pcName = encode(self.pcName)
@@ -469,7 +469,7 @@ class SaveFile:
             #--Pre-Created
             out.write(self.preCreated)
             #--Created
-            progress(0.1,_(u'Writing created.'))
+            progress(0.1,_('Writing created.'))
             modWriter = ModWriter(out)
             _pack('I',len(self.created))
             for record in self.created:
@@ -477,7 +477,7 @@ class SaveFile:
             #--Pre-records
             out.write(self.preRecords)
             #--Records, temp effects, fids, worldspaces
-            progress(0.2,_(u'Writing records.'))
+            progress(0.2,_('Writing records.'))
             for fid,recType,flags,version,data in self.records:
                 _pack('=IBIBH',fid,recType,flags,version,len(data))
                 out.write(data)
@@ -485,7 +485,7 @@ class SaveFile:
             _pack('I',len(self.tempEffects))
             out.write(self.tempEffects)
             #--Fids
-            progress(0.9,_(u'Writing fids, worldids.'))
+            progress(0.9,_('Writing fids, worldids.'))
             fidsPos = out.tell()
             out.seek(fidsPointerPos)
             _pack('I',fidsPos)
@@ -496,7 +496,7 @@ class SaveFile:
             _pack('I',len(self.worldSpaces))
             self.worldSpaces.tofile(out)
             #--Done
-            progress(1.0,_(u'Writing complete.'))
+            progress(1.0,_('Writing complete.'))
 
     def safeSave(self,progress=None):
         """Save data to file safely."""
@@ -568,7 +568,7 @@ class SaveFile:
             if fid is None: return None
             modName,object = fid
             mod = indices[modName]
-            return (long(mod) << 24 ) | long(object)
+            return (int(mod) << 24 ) | int(object)
         return mapper
 
     def getFid(self,iref,default=None):
@@ -576,7 +576,7 @@ class SaveFile:
         if not iref: return default
         if iref >> 24 == 0xFF: return iref
         if iref >= len(self.fids): raise ModError(self.fileInfo.name,
-                                                  u'IRef from Mars.')
+                                                  'IRef from Mars.')
         return self.fids[iref]
 
     def getIref(self,fid):
@@ -599,22 +599,22 @@ class SaveFile:
             elif modIndex == 0xFF:
                 return self.fileInfo.name.s
             else:
-                return _(u'Missing Master ')+hex(modIndex)
+                return _('Missing Master ')+hex(modIndex)
         #--ABomb
         (tesClassSize,abombCounter,abombFloat) = self.getAbomb()
-        log.setHeader(_(u'Abomb Counter'))
-        log(_(u'  Integer:\t0x%08X') % abombCounter)
-        log(_(u'  Float:\t%.2f') % abombFloat)
+        log.setHeader(_('Abomb Counter'))
+        log(_('  Integer:\t0x%08X') % abombCounter)
+        log(_('  Float:\t%.2f') % abombFloat)
         #--FBomb
-        log.setHeader(_(u'Fbomb Counter'))
-        log(_(u'  Next in-game object: %08X') % struct_unpack('I', self.preGlobals[:4]))
+        log.setHeader(_('Fbomb Counter'))
+        log(_('  Next in-game object: %08X') % struct_unpack('I', self.preGlobals[:4]))
         #--Array Sizes
-        log.setHeader(u'Array Sizes')
-        log(u'  %d\t%s' % (len(self.created),_(u'Created Items')))
-        log(u'  %d\t%s' % (len(self.records),_(u'Records')))
-        log(u'  %d\t%s' % (len(self.fids),_(u'Fids')))
+        log.setHeader('Array Sizes')
+        log('  %d\t%s' % (len(self.created),_('Created Items')))
+        log('  %d\t%s' % (len(self.records),_('Records')))
+        log('  %d\t%s' % (len(self.fids),_('Fids')))
         #--Created Types
-        log.setHeader(_(u'Created Items'))
+        log.setHeader(_('Created Items'))
         createdHisto = {}
         id_created = {}
         for citem in self.created:
@@ -623,7 +623,7 @@ class SaveFile:
             id_created[citem.fid] = citem
         for type in sorted(createdHisto.keys()):
             count,size = createdHisto[type]
-            log(u'  %d\t%d kb\t%s' % (count,size/1024,type))
+            log('  %d\t%d kb\t%s' % (count,size/1024,type))
         #--Fids
         lostRefs = 0
         idHist = [0]*256
@@ -655,10 +655,10 @@ class SaveFile:
             #--Unknown type?
             if doUnknownTypes and type not in knownTypes:
                 if mod < 255:
-                    print type,hex(fid),getMaster(mod)
+                    print(type,hex(fid),getMaster(mod))
                     knownTypes.add(type)
                 elif fid in id_created:
-                    print type,hex(fid),id_created[fid].recType
+                    print(type,hex(fid),id_created[fid].recType)
                     knownTypes.add(type)
             #--Obj ref parents
             if type == 49 and mod == 255 and (flags & 2):
@@ -671,37 +671,37 @@ class SaveFile:
                     objRefNullBases += 1
         saveRecTypes = bush.saveRecTypes
         #--Fids log
-        log.setHeader(_(u'Fids'))
-        log(u'  Refed\tChanged\tMI    Mod Name')
-        log(u'  %d\t\t     Lost Refs (Fid == 0)' % lostRefs)
+        log.setHeader(_('Fids'))
+        log('  Refed\tChanged\tMI    Mod Name')
+        log('  %d\t\t     Lost Refs (Fid == 0)' % lostRefs)
         for modIndex,(irefed,changed) in enumerate(zip(idHist,changeHisto)):
             if irefed or changed:
-                log(u'  %d\t%d\t%02X   %s' % (irefed,changed,modIndex,getMaster(modIndex)))
+                log('  %d\t%d\t%02X   %s' % (irefed,changed,modIndex,getMaster(modIndex)))
         #--Lost Changes
         if lostChanges:
-            log.setHeader(_(u'LostChanges'))
+            log.setHeader(_('LostChanges'))
             for id in sorted(lostChanges.keys()):
                 type = lostChanges[id][1]
-                log(hex(id)+saveRecTypes.get(type,unicode(type)))
+                log(hex(id)+saveRecTypes.get(type,str(type)))
         for type in sorted(typeModHisto.keys()):
             modHisto = typeModHisto[type]
-            log.setHeader(u'%d %s' % (type,saveRecTypes.get(type,_(u'Unknown')),))
+            log.setHeader('%d %s' % (type,saveRecTypes.get(type,_('Unknown')),))
             for modIndex,count in enumerate(modHisto):
-                if count: log(u'  %d\t%s' % (count,getMaster(modIndex)))
-            log(u'  %d\tTotal' % (sum(modHisto),))
-        objRefBases = dict((key,value) for key,value in objRefBases.iteritems() if value[0] > 100)
-        log.setHeader(_(u'New ObjectRef Bases'))
+                if count: log('  %d\t%s' % (count,getMaster(modIndex)))
+            log('  %d\tTotal' % (sum(modHisto),))
+        objRefBases = dict((key,value) for key,value in objRefBases.items() if value[0] > 100)
+        log.setHeader(_('New ObjectRef Bases'))
         if objRefNullBases:
-            log(u' Null Bases: %s' % objRefNullBases)
+            log(' Null Bases: %s' % objRefNullBases)
         if objRefBases:
-            log(_(u' Count IRef     BaseId'))
+            log(_(' Count IRef     BaseId'))
             for iref in sorted(objRefBases.keys()):
                 count,cumSize = objRefBases[iref]
                 if iref >> 24 == 255:
                     parentid = iref
                 else:
                     parentid = self.fids[iref]
-                log(u'%6d %08X %08X %6d kb' % (count,iref,parentid,cumSize/1024))
+                log('%6d %08X %08X %6d kb' % (count,iref,parentid,cumSize/1024))
 
     def findBloating(self,progress=None):
         """Analyzes file for bloating. Returns (createdCounts,nullRefCount)."""
@@ -710,7 +710,7 @@ class SaveFile:
         progress = progress or bolt.Progress()
         progress.setFull(len(self.created)+len(self.records))
         #--Created objects
-        progress(0,_(u'Scanning created objects'))
+        progress(0,_('Scanning created objects'))
         fullAttr = 'full'
         for citem in self.created:
             if fullAttr in citem.__class__.__slots__:
@@ -722,12 +722,12 @@ class SaveFile:
                 count = createdCounts.get(typeFull,0)
                 createdCounts[typeFull] = count + 1
             progress.plus()
-        for key in createdCounts.keys()[:]:
+        for key in list(createdCounts.keys())[:]:
             minCount = (50,100)[key[0] == 'ALCH']
             if createdCounts[key] < minCount:
                 del createdCounts[key]
         #--Change records
-        progress(len(self.created),_(u'Scanning change records.'))
+        progress(len(self.created),_('Scanning change records.'))
         fids = self.fids
         for record in self.records:
             fid,recType,flags,version,data = record
@@ -746,7 +746,7 @@ class SaveFile:
         uncreated = set()
         #--Uncreate
         if uncreateKeys:
-            progress(0,_(u'Scanning created objects'))
+            progress(0,_('Scanning created objects'))
             kept = []
             for citem in self.created:
                 if 'full' in citem.__class__.__slots__:
@@ -761,7 +761,7 @@ class SaveFile:
                 progress.plus()
             self.created = kept
         #--Change records
-        progress(progress.state,_(u'Scanning change records.'))
+        progress(progress.state,_('Scanning change records.'))
         fids = self.fids
         kept = []
         for record in self.records:
@@ -847,7 +847,7 @@ class SaveSpells:
         modFile = ModFile(modInfo, loadFactory)
         try: modFile.load(True)
         except ModError as err:
-            deprint(_(u'skipped mod due to read error (%s)') % err)
+            deprint(_('skipped mod due to read error (%s)') % err)
             return
         modFile.convertToLongFids(('SPEL',))
         spells = modInfo.extras['bash.spellList'] = dict(
