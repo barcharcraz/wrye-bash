@@ -30,7 +30,8 @@ from . import bass
 from . import load_order
 from .ScriptParser import error
 import wx
-import wx.wizard as wiz     # wxPython wizard class
+import wx.adv
+#import wx.adv.Wizard as wiz     # wxPython wizard class
 from . import bosh, balt, bolt, bush
 from .balt import vspace, hspace
 from .env import get_file_version
@@ -79,9 +80,9 @@ class WizardReturn(object):
 #  Class used by Wrye Bash, creates a wx Wizard that
 #  dynamically creates pages based on a script
 #---------------------------------------------------
-class InstallerWizard(wiz.Wizard):
+class InstallerWizard(wx.adv.Wizard):
     def __init__(self, parentWindow, installer, bAuto, subs, pageSize, pos):
-        wiz.Wizard.__init__(self, parentWindow, title=_('Installer Wizard'),
+        wx.adv.Wizard.__init__(self, parentWindow, title=_('Installer Wizard'),
                             pos=pos, style=wx.DEFAULT_DIALOG_STYLE |
                                            wx.RESIZE_BORDER | wx.MAXIMIZE_BOX)
 
@@ -179,10 +180,10 @@ class InstallerWizard(wiz.Wizard):
 #  base class for all the parser wizard pages, just to handle
 #  a couple simple things here
 #-------------------------------------------------------------
-class PageInstaller(wiz.PyWizardPage):
+class PageInstaller(wx.adv.WizardPage):
 
     def __init__(self, parent):
-        wiz.PyWizardPage.__init__(self, parent)
+        wx.adv.WizardPage.__init__(self, parent)
         self.parent = parent
         self._enableForward(True)
 

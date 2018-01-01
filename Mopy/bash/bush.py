@@ -59,7 +59,7 @@ def _supportedGames(useCache=True):
         if not ispkg: continue # game support modules are packages
         # Equivalent of "from game import <modname>"
         try:
-            module = __import__('game',globals(),locals(),[modname],-1)
+            module = __import__('game',globals(),locals(),[modname],1)
             submod = getattr(module,modname)
             _allGames[submod.fsName] = submod
             _fsName_display[submod.fsName] = submod.displayName
@@ -408,9 +408,9 @@ _strU = struct.Struct('I')
 mgef_school = dict((x, y) for x, [y, z, _num] in list(magicEffects.items()))
 mgef_name = dict((x, z) for x, [y, z, __num] in list(magicEffects.items()))
 mgef_basevalue = dict((x,a) for x,[y,z,a] in list(magicEffects.items()))
-mgef_school.update(dict((_strU.unpack(x)[0],y) for x,[y,z,a] in list(magicEffects.items())))
-mgef_name.update(dict((_strU.unpack(x)[0],z) for x,[y,z,a] in list(magicEffects.items())))
-mgef_basevalue.update(dict((_strU.unpack(x)[0],a) for x,[y,z,a] in list(magicEffects.items())))
+mgef_school.update(dict((_strU.unpack(x.encode('utf-8'))[0],y) for x,[y,z,a] in list(magicEffects.items())))
+mgef_name.update(dict((_strU.unpack(x.encode('utf-8'))[0],z) for x,[y,z,a] in list(magicEffects.items())))
+mgef_basevalue.update(dict((_strU.unpack(x.encode('utf-8'))[0],a) for x,[y,z,a] in list(magicEffects.items())))
 
 hostileEffects = {
     'ABAT', #--Absorb Attribute
@@ -449,7 +449,7 @@ hostileEffects = {
     'WKPO', #--Weakness to Poison
     'WKSH', #--Weakness to Shock
     }
-hostileEffects |= set((_strU.unpack(x)[0] for x in hostileEffects))
+hostileEffects |= set((_strU.unpack(x.encode('utf-8'))[0] for x in hostileEffects))
 
 #Doesn't list mgefs that use actor values, but rather mgefs that have a generic name
 #Ex: Absorb Attribute becomes Absorb Magicka if the effect's actorValue field contains 9
@@ -465,7 +465,7 @@ genericAVEffects = {
     'FOSK', #--Fortify Skill (Use Skill)
     'REAT', #--Restore Attribute (Use Attribute)
     }
-genericAVEffects |= set((_strU.unpack(x)[0] for x in genericAVEffects))
+genericAVEffects |= set((_strU.unpack(x.encode('utf-8'))[0] for x in genericAVEffects))
 
 actorValues = [
     _('Strength'), #--00

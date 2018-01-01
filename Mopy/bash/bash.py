@@ -264,7 +264,7 @@ def main(opts):
             _('https://afkmods.iguanadons.net/index.php?/topic/4966-wrye-bash-all-games/& or '),
             _('https://bethesda.net/community/topic/38798/relz-wrye-bash-oblivion-skyrim-skyrim-se-fallout-4/'),
             '',
-            traceback.format_exc(e)
+            traceback.format_exc()
         ])
         _close_dialog_windows()
         _show_wx_error(msg)
@@ -299,10 +299,10 @@ def _main(opts):
     # properly
     if is_standalone:
         pathToProg = os.path.dirname(
-            str(sys.executable, bolt.Path.sys_fs_enc))
+            str(sys.executable + bolt.Path.sys_fs_enc))
     else:
         pathToProg = os.path.dirname(
-            str(sys.argv[0], bolt.Path.sys_fs_enc))
+            str(sys.argv[0] + bolt.Path.sys_fs_enc))
     if pathToProg:
         os.chdir(pathToProg)
     del pathToProg
@@ -560,8 +560,8 @@ def _rightWxVersion():
 
 def _rightPythonVersion():
     sysVersion = sys.version_info[:3]
-    if sysVersion < (2, 7) or sysVersion >= (3,):
-        balt.showError(None, _("Only Python 2.7 and newer is supported "
+    if sysVersion < (3, 6):
+        balt.showError(None, _("Only Python 3.6 and newer is supported "
             "(%s.%s.%s detected). If you know what you're doing install the "
             "WB python version and edit this warning out. "
             "Wrye Bash will exit.") % sysVersion,

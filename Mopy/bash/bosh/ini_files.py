@@ -134,10 +134,6 @@ class IniFile(AFile):
             sectionSettings = None
             section = None
             for i,line in enumerate(iniFile.readlines()):
-                try:
-                    line = str(line,encoding)
-                except UnicodeDecodeError:
-                    line = str(line,'cp1252')
                 maDeleted = reDeleted.match(line)
                 stripped = reComment.sub('',line).strip()
                 maSection = reSection.match(stripped)

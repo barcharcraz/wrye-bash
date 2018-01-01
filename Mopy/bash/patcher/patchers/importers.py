@@ -177,7 +177,11 @@ class _SimpleImporter(ImportPatcher):
         modFileTops = self.patchFile.tops
         keep = self.patchFile.getKeeper()
         type_count = collections.defaultdict(int)
-        types = [x for x in types if types else [x.classType for x in self.srcClasses] if x in modFileTops]
+        if types: 
+            types = [x for x in types]
+        else: 
+            types = [x.classType for x in self.srcClasses if x in modFileTops]
+        #types = [x for x in types if types else [x.classType for x in self.srcClasses] if x in modFileTops]
         for top_mod_rec in types:
             records = modFileTops[top_mod_rec].records
             self._inner_loop(keep, records, top_mod_rec, type_count)

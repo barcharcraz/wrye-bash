@@ -61,7 +61,7 @@ import time
 from collections import OrderedDict
 from functools import partial
 from operator import itemgetter
-from types import ClassType
+#from types import ClassType
 #--wxPython
 import wx
 
@@ -3358,7 +3358,7 @@ class _Tab_Link(AppendableLink, CheckLink, EnabledLink):
                 Link.Frame.notebook.InsertPage(insertAt,panel,title)
         bass.settings['bash.tabs.order'][self.tabKey] ^= True
 
-class BashNotebook(wx.Notebook, balt.TabDragMixin):
+class BashNotebook(wx.Notebook): #balt.TabDragMixin
 
     # default tabs order and default enabled state, keys as in tabInfo
     _tabs_enabled_ordered = OrderedDict((('Installers', True),
@@ -4058,7 +4058,7 @@ class BashApp(wx.App):
         #--Window sizes by class name rather than by class
         if settings['bash.version'] < 43:
             for key,value in list(balt.sizes.items()):
-                if isinstance(key,ClassType):
+                if isinstance(key,type):
                     balt.sizes[key.__name__] = value
                     del balt.sizes[key]
         #--Current Version

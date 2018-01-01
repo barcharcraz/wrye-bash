@@ -41,6 +41,7 @@ from functools import partial, wraps
 from collections import OrderedDict
 #--wx
 import wx
+import wx.adv
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from wx.lib.embeddedimage import PyEmbeddedImage
 import wx.lib.newevent
@@ -3052,7 +3053,7 @@ class DnDStatusBar(wx.StatusBar):
         if event: event.Skip()
 
 #------------------------------------------------------------------------------
-class WryeBashSplashScreen(wx.SplashScreen):
+class WryeBashSplashScreen(wx.adv.SplashScreen):
     """This Creates the Splash Screen widget. (The first image you see when
     starting the Application.)"""
     def __init__(self, parent=None):
