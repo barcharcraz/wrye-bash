@@ -155,69 +155,6 @@ def exit_cleanup():
             except:
                 pass
 
-<<<<<<< HEAD
-    if basher:
-        from .basher import appRestart
-        from .basher import uacRestart
-        if appRestart:
-            if not is_standalone:
-                exePath = bolt.GPath(sys.executable)
-                sys.argv = [exePath.stail] + sys.argv
-            if '--restarting' not in sys.argv:
-                sys.argv += ['--restarting']
-            #--Assume if we're restarting that they don't want to be
-            #  prompted again about UAC
-            if '--no-uac' not in sys.argv:
-                sys.argv += ['--no-uac']
-            def updateArgv(args):
-                if isinstance(args,(list,tuple)):
-                    if len(args) > 0 and isinstance(args[0],(list,tuple)):
-                        for arg in args:
-                            updateArgv(arg)
-                    else:
-                        found = 0
-                        for i in range(len(sys.argv)):
-                            if not found and sys.argv[i] == args[0]:
-                                found = 1
-                            elif found:
-                                if found < len(args):
-                                    sys.argv[i] = args[found]
-                                    found += 1
-                                else:
-                                    break
-                        else:
-                            sys.argv.extend(args)
-            updateArgv(appRestart)
-            try:
-                if uacRestart:
-                    if not is_standalone:
-                        sys.argv = sys.argv[1:]
-                    import win32api
-                    if is_standalone:
-                        win32api.ShellExecute(0,'runas',sys.argv[0],' '.join(
-                            '"%s"' % x for x in sys.argv[1:]),None,True)
-                    else:
-                        args = ' '.join(
-                            ['%s','"%s"'][' ' in x] % x for x in sys.argv)
-                        win32api.ShellExecute(0,'runas',exePath.s,args,None,
-                                              True)
-                    return
-                else:
-                    import subprocess
-                    if is_standalone:
-                        subprocess.Popen(sys.argv,close_fds=bolt.close_fds)
-                    else:
-                        subprocess.Popen(sys.argv,executable=exePath.s,
-                                         close_fds=bolt.close_fds)
-                                         #close_fds is needed for the one
-                                         # instance checker
-            except Exception as error:
-                print(error)
-                print('Error Attempting to Restart Wrye Bash!')
-                print('cmd line: %s %s' %(exePath.s, sys.argv))
-                print()
-                raise
-=======
     if bass.is_restarting:
         cli = cmd_line = bass.sys_argv # list of cli args
         try:
@@ -245,7 +182,6 @@ def exit_cleanup():
             print u'cmd line: %s' % (cmd_line, )
             print
             raise
->>>>>>> upstream/dev
 
 def dump_environment():
     import locale
@@ -267,16 +203,10 @@ def dump_environment():
             sys.stdin.encoding,getattr(sys.stdout,'encoding',None),
             locale.getdefaultlocale()
         ),
-<<<<<<< HEAD
-        'filesystem encoding: %s%s' % (fse,
-            (' - using %s' % bolt.Path.sys_fs_enc) if bolt is not None
-                                                       and not fse else '')
-=======
         u'filesystem encoding: %s%s' % (fse,
             (u' - using %s' % bolt.Path.sys_fs_enc) if bolt is not None
                                                        and not fse else u''),
         u'command line: %s' % (bass.sys_argv, )
->>>>>>> upstream/dev
     ])
     if bolt.scandir is not None:
         msg = '\n'.join( [msg, 'Using scandir ' + bolt.scandir.__version__])
@@ -316,13 +246,9 @@ def _main(opts):
 
     :param opts: command line arguments
     """
-<<<<<<< HEAD
-    from . import env # env imports bolt (this needs fixing)
-=======
     import barg
     bass.sys_argv = barg.convert_to_long_options(sys.argv)
     import env # env imports bolt (this needs fixing)
->>>>>>> upstream/dev
     bolt.deprintOn = opts.debug
     # useful for understanding context of bug reports
     if opts.debug or is_standalone:

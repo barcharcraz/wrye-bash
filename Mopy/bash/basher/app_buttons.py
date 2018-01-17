@@ -235,14 +235,8 @@ class App_Button(StatusBar_Button):
                 self.jar.head.setcwd()
             try:
                 subprocess.Popen(
-<<<<<<< HEAD
-                    (self.java.stail, '-jar', self.jar.stail, self.appArgs),
-                    #close_fds is needed for the one instance checker
-                    executable=self.java.s, close_fds=bolt.close_fds)
-=======
                     (self.java.stail, u'-jar', self.jar.stail, self.appArgs),
                      executable=self.java.s, close_fds=True)
->>>>>>> upstream/dev
             except UnicodeError:
                 self._showUnicodeError()
             except Exception as error:

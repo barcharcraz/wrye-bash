@@ -3667,35 +3667,9 @@ class BashFrame(BaltFrame):
     def BindRefresh(self, bind=True, __event=wx.EVT_ACTIVATE):
         self.Bind(__event, self.RefreshData) if bind else self.Unbind(__event)
 
-<<<<<<< HEAD
-    def Restart(self,args=True,uac=False):
-        if not args: return
-
-        def argConvert(arg):
-            """Converts --args into -a args"""
-            if not isinstance(arg,str): return arg
-            elif arg in sys.argv: return arg
-            elif arg[:2] == '--': return '-'+arg[2]
-            else: return arg
-
-        newargs = []
-        if isinstance(args,(list,tuple)):
-            args = [[argConvert(x) for x in arg] if isinstance(arg,(list,tuple))
-                    else argConvert(arg)
-                    for arg in args]
-        elif isinstance(args,set):
-            # Special case for restarting for an update: args passed in as set()
-            pass
-        else:
-            args = argConvert(args)
-
-        global appRestart
-        appRestart = args
-=======
     def Restart(self, *args):
         """Restart Bash - edit bass.sys_argv with specified args then let
         bash.exit_cleanup() handle restart.
->>>>>>> upstream/dev
 
         :param args: tuple of lists of command line args - use the *long*
                      options, for instance --Language and not -L

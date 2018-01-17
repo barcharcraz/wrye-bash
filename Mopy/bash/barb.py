@@ -144,24 +144,6 @@ class BackupSettings(BaseBackupSettings):
                 if fpath.exists():
                     self.files[tmp_dir.join(name)] = fpath
 
-<<<<<<< HEAD
-        #backup image files if told to
-        def _isChanged(ab_path, rel_path):
-            for ver_list in list(images_list.values()):
-                if  ver_list.get(rel_path.s, -1) == ab_path.size: return False
-            return True
-        if handle_images: # 1 is changed images only, 2 is all images
-            onlyChanged = handle_images == 1
-            tmpdir = GPath(jo(game, 'Mopy', 'bash', 'images'))
-            image_dir = dirs['images']
-            for name in image_dir.list():
-                fullname = image_dir.join(name)
-                if fullname.isfile() and not name.s.lower() == 'thumbs.db' \
-                        and (not onlyChanged or _isChanged(fullname, name)):
-                    self.files[tmpdir.join(name)] = fullname
-
-=======
->>>>>>> upstream/dev
         #backup save profile settings
         savedir = GPath('My Games').join(game)
         profiles = [''] + bosh.SaveInfos.getLocalSaveDirs()

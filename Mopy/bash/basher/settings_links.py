@@ -58,27 +58,6 @@ class Settings_BackupSettings(ItemLink):
         msg = _('Do you want to backup your Bash settings now?')
         if not balt.askYes(Link.Frame, msg,_('Backup Bash Settings?')): return
         with balt.BusyCursor(): BashFrame.SaveSettings(Link.Frame)
-<<<<<<< HEAD
-        dialog = balt.Dialog(Link.Frame,_('Backup Images?'),size=(400,200))
-        icon = staticBitmap(dialog)
-        sizer = vSizer(
-            (hSizer((icon,0,wx.ALL,6), hspace(6),
-                    (StaticText(dialog,_('Do you want to backup any images?'),
-                                noAutoResize=True),1,wx.EXPAND),
-                    ),1,wx.EXPAND|wx.ALL,6),
-            (hSizer(hspacer,
-                    Button(dialog, label=_('Backup All Images'),
-                           onButClick=lambda: dialog.EndModal(2)), hspace(),
-                    Button(dialog, label=_('Backup Changed Images'),
-                           onButClick=lambda: dialog.EndModal(1)), hspace(),
-                    Button(dialog, label=_('None'),
-                           onButClick=lambda: dialog.EndModal(0)),
-                    ),0,wx.EXPAND|wx.ALL^wx.TOP,6),
-            )
-        dialog.SetSizer(sizer)
-        with dialog: images = dialog.ShowModal()
-=======
->>>>>>> upstream/dev
         backup = barb.BackupSettings.get_backup_instance(
             Link.Frame, settings_file=None)
         if not backup: return
@@ -106,12 +85,6 @@ class Settings_RestoreSettings(ItemLink):
             Link.Frame, settings_file=None) # prompt for backup filename
         if not backup: return
         try:
-<<<<<<< HEAD
-            backup.restore_images = balt.askYes(Link.Frame,
-                _('Do you want to restore saved images as well as settings?'),
-                _('Restore Settings'))
-=======
->>>>>>> upstream/dev
             with balt.BusyCursor(): backup.Apply()
         except exception.StateError:
             deprint('Restore settings failed:', traceback=True)
@@ -322,15 +295,9 @@ class Settings_Language(RadioLink):
     def Execute(self):
         if self._lang == _bassLang(): return
         if balt.askYes(Link.Frame,
-<<<<<<< HEAD
-                _('Wrye Bash needs to restart to change languages.  Do you '
-                  'want to restart?'), _('Restart Wrye Bash')):
-            Link.Frame.Restart(('--Language',self._lang))
-=======
                 _(u'Wrye Bash needs to restart to change languages.  Do you '
                   u'want to restart?'), _(u'Restart Wrye Bash')):
             Link.Frame.Restart(['--Language', self._lang])
->>>>>>> upstream/dev
 
 #------------------------------------------------------------------------------
 class Settings_PluginEncodings(MenuLink):
@@ -452,15 +419,9 @@ class Settings_UAC(AppendableLink, ItemLink):
 
     def Execute(self):
         if balt.askYes(Link.Frame,
-<<<<<<< HEAD
-                _('Restart Wrye Bash with administrator privileges?'),
-                _('Administrator Mode'), ):
-            Link.Frame.Restart(True,True)
-=======
                 _(u'Restart Wrye Bash with administrator privileges?'),
                 _(u'Administrator Mode'), ):
             Link.Frame.Restart(['--uac'])
->>>>>>> upstream/dev
 
 class Settings_Deprint(CheckLink):
     """Turn on deprint/delist."""
