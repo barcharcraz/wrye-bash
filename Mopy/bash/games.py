@@ -89,11 +89,15 @@ def _parse_plugins_txt_(path, mod_infos, _star):
             # use raw strings below
             is_active = not _star or modname.startswith('*')
             if _star and is_active: modname = modname[1:]
+            modname = bolt.GPath(modname)
+            # TODO: Unicode stuff, should be removed
+            """
             try:
                 test = bolt.decode(modname, encoding='cp1252')
             except UnicodeError:
                 bolt.deprint('%r failed to properly decode' % modname)
                 continue
+            
             if bolt.GPath(test) not in mod_infos:
                 # The automatic encoding detector could have returned
                 # an encoding it actually wasn't.  Luckily, we
@@ -111,6 +115,7 @@ def _parse_plugins_txt_(path, mod_infos, _star):
                     modname = bolt.GPath(test)
             else:
                 modname = bolt.GPath(test)
+            """
             modnames.append(modname)
             if is_active: active.append(modname)
     return active, modnames
