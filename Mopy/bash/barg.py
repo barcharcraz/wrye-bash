@@ -93,22 +93,6 @@ def parse():
     any prompts or message dialogs."""
     arg(backupGroup, '-q', '--quiet-quit', dest='quietquit',
         action='store_true', default=False)
-    # images...
-    parser.set_defaults(backup_images=0)
-    backupGroup.add_argument('-i', '--include-changed-images',
-                             action='store_const',
-                             const=1,
-                             dest='backup_images',
-                             help='Include changed images from '
-                                  'mopy/bash/images in the backup. Include '
-                                  'any image(s) from backup file in restore.')
-    backupGroup.add_argument('-I', '--include-all-images',
-                             action='store_const',
-                             const=2,
-                             dest='backup_images',
-                             help='Include all images from mopy/bash/images '
-                                  'in the backup/restore (if present in '
-                                  'backup file).')
 
     #### Individual Arguments ####
     parser.add_argument('-d', '--debug',
@@ -132,20 +116,13 @@ def parse():
                         dest='mode',
                         help='disables CBash and uses python code to build '
                              'bashed patch.')
-    parser.add_argument('--restarting',
-                        action='store_true',
-                        default=False,
-                        dest='restarting',
-                        help=argparse.SUPPRESS)
     parser.add_argument('--no-uac',
                         action='store_true',
-                        default=False,
                         dest='noUac',
                         help='suppress the prompt to restart in admin mode '
                              'when UAC is detected.')
     parser.add_argument('--uac',
                         action='store_true',
-                        default=False,
                         dest='uac',
                         help='always start in admin mode if UAC protection is '
                              'detected.')
@@ -161,3 +138,16 @@ def parse():
 
     args = parser.parse_args()
     return args
+
+_short_to_long = dict(
+    [('-o', '--oblivionPath'), ('-p', '--personalPath'), ('-u', '--userPath'),
+     ('-l', '--localAppDataPath'), ('-b', '--backup'), ('-r', '--restore'),
+     ('-q', '--quiet-quit'), ('-f', '--filename'),
+     ('-d', '--debug'), ('-C', '--Cbash-mode'), ('-P', '--Python-mode'),
+     ('-L', '--Language'), ])
+
+def convert_to_long_options(sys_argv):
+    for j, arg in enumerate(sys_argv):
+        if arg in _short_to_long:
+            sys_argv[j] = _short_to_long[arg]
+    return sys_argv

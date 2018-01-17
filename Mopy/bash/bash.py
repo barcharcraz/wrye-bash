@@ -97,7 +97,7 @@ def cmdBackup(opts):
     if barb.new_bash_version_prompt_backup() or opts.backup:
         frame = balt.Link.Frame
         backup = barb.BackupSettings.get_backup_instance(frame, path,
-            should_quit, opts.backup_images)
+            should_quit)
         if not backup: return
         try:
             backup.Apply()
@@ -119,7 +119,7 @@ def cmdRestore(opts):
     if not basher: from . import basher, balt, barb
     should_quit = opts.quietquit
     backup = barb.RestoreSettings.get_backup_instance(balt.Link.Frame,
-        opts.filename or None, should_quit, opts.backup_images)
+        opts.filename or None, should_quit)
     if not backup : return False
     backup.Apply()
     return should_quit
@@ -128,7 +128,8 @@ def assure_single_instance(instance):
     """Ascertain that only one instance of Wrye Bash is running.
 
     If this is the second instance running, then display an error message and
-    exit.
+    exit. 'instance' must stay alive for the whole execution of the program.
+    See: https://wxpython.org/Phoenix/docs/html/wx.SingleInstanceChecker.html
 
     :type instance: wx.SingleInstanceChecker"""
     if instance.IsAnotherRunning():
@@ -154,6 +155,7 @@ def exit_cleanup():
             except:
                 pass
 
+<<<<<<< HEAD
     if basher:
         from .basher import appRestart
         from .basher import uacRestart
@@ -215,6 +217,35 @@ def exit_cleanup():
                 print('cmd line: %s %s' %(exePath.s, sys.argv))
                 print()
                 raise
+=======
+    if bass.is_restarting:
+        cli = cmd_line = bass.sys_argv # list of cli args
+        try:
+            if '--uac' in bass.sys_argv: ##: mostly untested - needs revamp
+                import win32api
+                if is_standalone:
+                    exe = cli[0]
+                    cli = cli[1:]
+                else:
+                    exe = sys.executable
+                exe = [u'%s', u'"%s"'][u' ' in exe] % exe
+                cli = u' '.join([u'%s', u'"%s"'][u' ' in x] % x for x in cli)
+                cmd_line = u'%s %s' % (exe, cli)
+                win32api.ShellExecute(0, 'runas', exe, cli, None, True)
+                return
+            else:
+                import subprocess
+                cmd_line = (is_standalone and cli) or [sys.executable] + cli
+                subprocess.Popen(cmd_line, # a list, no need to escape spaces
+                                 close_fds=True)
+
+        except Exception as error:
+            print error
+            print u'Error Attempting to Restart Wrye Bash!'
+            print u'cmd line: %s' % (cmd_line, )
+            print
+            raise
+>>>>>>> upstream/dev
 
 def dump_environment():
     import locale
@@ -236,9 +267,16 @@ def dump_environment():
             sys.stdin.encoding,getattr(sys.stdout,'encoding',None),
             locale.getdefaultlocale()
         ),
+<<<<<<< HEAD
         'filesystem encoding: %s%s' % (fse,
             (' - using %s' % bolt.Path.sys_fs_enc) if bolt is not None
                                                        and not fse else '')
+=======
+        u'filesystem encoding: %s%s' % (fse,
+            (u' - using %s' % bolt.Path.sys_fs_enc) if bolt is not None
+                                                       and not fse else u''),
+        u'command line: %s' % (bass.sys_argv, )
+>>>>>>> upstream/dev
     ])
     if bolt.scandir is not None:
         msg = '\n'.join( [msg, 'Using scandir ' + bolt.scandir.__version__])
@@ -278,7 +316,13 @@ def _main(opts):
 
     :param opts: command line arguments
     """
+<<<<<<< HEAD
     from . import env # env imports bolt (this needs fixing)
+=======
+    import barg
+    bass.sys_argv = barg.convert_to_long_options(sys.argv)
+    import env # env imports bolt (this needs fixing)
+>>>>>>> upstream/dev
     bolt.deprintOn = opts.debug
     # useful for understanding context of bug reports
     if opts.debug or is_standalone:
@@ -295,6 +339,10 @@ def _main(opts):
     if opts.debug:
         dump_environment()
 
+    # Check if there are other instances of Wrye Bash running
+    instance = _wx.SingleInstanceChecker('Wrye Bash') # must stay alive !
+    assure_single_instance(instance)
+
     # ensure we are in the correct directory so relative paths will work
     # properly
     if is_standalone:
@@ -306,10 +354,6 @@ def _main(opts):
     if pathToProg:
         os.chdir(pathToProg)
     del pathToProg
-
-    # Check if there are other instances of Wrye Bash running
-    instance = _wx.SingleInstanceChecker('Wrye Bash')
-    assure_single_instance(instance)
 
     # Detect the game we're running for ---------------------------------------
     from . import bush
@@ -336,7 +380,7 @@ def _main(opts):
             bolt.deprint("No games were found or Selected. Aborting.")
             return
         # Add the game to the command line, so we use it if we restart
-        sys.argv += ['-o', bush.game_path(retCode).s]
+        bass.update_sys_argv(['--oblivionPath', bush.game_path(retCode).s])
         bush.detect_and_set_game(opts.oblivionPath, bashIni, retCode)
 
     # from now on bush.game is set
@@ -403,7 +447,7 @@ def _main(opts):
     should_quit = cmdRestore(opts) or should_quit
     if should_quit: return
     if env.isUAC:
-        uacRestart = False
+        uacRestart = opts.uac
         if not opts.noUac and not opts.uac:
             # Show a prompt asking if we should restart in Admin Mode
             message = _(
@@ -415,11 +459,9 @@ def _main(opts):
             uacRestart = balt.ask_uac_restart(message,
                                               title=_('UAC Protection'),
                                               mopy=bass.dirs['mopy'])
-        elif opts.uac:
-            uacRestart = True
+            if uacRestart: bass.update_sys_argv(['--uac'])
         if uacRestart:
-            basher.appRestart = True
-            basher.uacRestart = True
+            bass.is_restarting = True
             return
 
     app.Init() # Link.Frame is set here !

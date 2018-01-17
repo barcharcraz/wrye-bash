@@ -24,15 +24,15 @@
 
 import locale
 import sys
-import wx
-from ..balt import ItemLink, vSizer, hSizer, hspacer, Button, AppendableLink, \
-    RadioLink, CheckLink, MenuLink, TransLink, EnabledLink, BoolLink, \
-    StaticText, tooltip, Link, staticBitmap, hspace
-from .. import barb, bush, balt, bass, bolt, env, exception
-from ..bolt import deprint, GPath
+
 from . import BashFrame, BashStatusBar
+from .app_buttons import App_Button  # TODO(ut): ugly
 from .dialogs import ColorDialog
-from .app_buttons import App_Button # TODO(ut): ugly
+from .. import barb, bush, balt, bass, bolt, env, exception
+from ..balt import ItemLink, AppendableLink, RadioLink, CheckLink, MenuLink, \
+    TransLink, EnabledLink, BoolLink, tooltip, Link
+from ..bolt import deprint, GPath
+
 # TODO(ut): settings links do not seem to use Link.data attribute - it's None..
 
 __all__ = ['Settings_BackupSettings', 'Settings_RestoreSettings',
@@ -58,6 +58,7 @@ class Settings_BackupSettings(ItemLink):
         msg = _('Do you want to backup your Bash settings now?')
         if not balt.askYes(Link.Frame, msg,_('Backup Bash Settings?')): return
         with balt.BusyCursor(): BashFrame.SaveSettings(Link.Frame)
+<<<<<<< HEAD
         dialog = balt.Dialog(Link.Frame,_('Backup Images?'),size=(400,200))
         icon = staticBitmap(dialog)
         sizer = vSizer(
@@ -76,8 +77,10 @@ class Settings_BackupSettings(ItemLink):
             )
         dialog.SetSizer(sizer)
         with dialog: images = dialog.ShowModal()
+=======
+>>>>>>> upstream/dev
         backup = barb.BackupSettings.get_backup_instance(
-            Link.Frame, settings_file=None, handle_images=images)
+            Link.Frame, settings_file=None)
         if not backup: return
         try:
             with balt.BusyCursor(): backup.Apply()
@@ -103,9 +106,12 @@ class Settings_RestoreSettings(ItemLink):
             Link.Frame, settings_file=None) # prompt for backup filename
         if not backup: return
         try:
+<<<<<<< HEAD
             backup.restore_images = balt.askYes(Link.Frame,
                 _('Do you want to restore saved images as well as settings?'),
                 _('Restore Settings'))
+=======
+>>>>>>> upstream/dev
             with balt.BusyCursor(): backup.Apply()
         except exception.StateError:
             deprint('Restore settings failed:', traceback=True)
@@ -316,9 +322,15 @@ class Settings_Language(RadioLink):
     def Execute(self):
         if self._lang == _bassLang(): return
         if balt.askYes(Link.Frame,
+<<<<<<< HEAD
                 _('Wrye Bash needs to restart to change languages.  Do you '
                   'want to restart?'), _('Restart Wrye Bash')):
             Link.Frame.Restart(('--Language',self._lang))
+=======
+                _(u'Wrye Bash needs to restart to change languages.  Do you '
+                  u'want to restart?'), _(u'Restart Wrye Bash')):
+            Link.Frame.Restart(['--Language', self._lang])
+>>>>>>> upstream/dev
 
 #------------------------------------------------------------------------------
 class Settings_PluginEncodings(MenuLink):
@@ -374,7 +386,7 @@ class _Settings_Game(RadioLink):
 
     def Execute(self):
         if self._check(): return
-        Link.Frame.Restart(('-o', bush.game_path(self._text).s))
+        Link.Frame.Restart(['--oblivionPath', bush.game_path(self._text).s])
 
 #------------------------------------------------------------------------------
 class Settings_UnHideButtons(TransLink):
@@ -440,9 +452,15 @@ class Settings_UAC(AppendableLink, ItemLink):
 
     def Execute(self):
         if balt.askYes(Link.Frame,
+<<<<<<< HEAD
                 _('Restart Wrye Bash with administrator privileges?'),
                 _('Administrator Mode'), ):
             Link.Frame.Restart(True,True)
+=======
+                _(u'Restart Wrye Bash with administrator privileges?'),
+                _(u'Administrator Mode'), ):
+            Link.Frame.Restart(['--uac'])
+>>>>>>> upstream/dev
 
 class Settings_Deprint(CheckLink):
     """Turn on deprint/delist."""

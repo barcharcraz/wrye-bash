@@ -102,9 +102,6 @@ except ImportError:
 if sys.prefix not in set(os.environ['PATH'].split(';')):
     os.environ['PATH'] += ';'+sys.prefix
 
-appRestart = False # restart Bash if true
-uacRestart = False # restart Bash with Admin Rights if true
-
 # Settings --------------------------------------------------------------------
 settings = None
 
@@ -3670,6 +3667,7 @@ class BashFrame(BaltFrame):
     def BindRefresh(self, bind=True, __event=wx.EVT_ACTIVATE):
         self.Bind(__event, self.RefreshData) if bind else self.Unbind(__event)
 
+<<<<<<< HEAD
     def Restart(self,args=True,uac=False):
         if not args: return
 
@@ -3693,9 +3691,21 @@ class BashFrame(BaltFrame):
 
         global appRestart
         appRestart = args
+=======
+    def Restart(self, *args):
+        """Restart Bash - edit bass.sys_argv with specified args then let
+        bash.exit_cleanup() handle restart.
+>>>>>>> upstream/dev
 
-        global uacRestart
-        uacRestart = uac
+        :param args: tuple of lists of command line args - use the *long*
+                     options, for instance --Language and not -L
+        """
+        for arg in args:
+            bass.update_sys_argv(arg)
+        #--Restarting, assume users don't want to be prompted again about UAC
+        bass.update_sys_argv(['--no-uac'])
+        # restart
+        bass.is_restarting = True
         self.Close(True)
 
     def SetTitle(*args, **kwargs):
@@ -3966,8 +3976,6 @@ class BashApp(wx.App):
     """Bash Application class."""
     def Init(self): # not OnInit(), we need to initialize _after_ the app has been instantiated
         """Initialize the application data and create the BashFrame."""
-        global appRestart
-        appRestart = False
         #--OnStartup SplashScreen and/or Progress
         #   Progress gets hidden behind splash by default, since it's not very informative anyway
         splashScreen = None
