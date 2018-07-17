@@ -1139,7 +1139,7 @@ class SaveInfo(FileInfo):
         """Return strings expressing whether cosaves exist and are correct."""
         cPluggy, cObse = (u'', u'')
         pluggy = self.name.root + u'.pluggy'
-        obse = self._get_se_cosave_path()
+        obse = self.get_se_cosave_path()
         if pluggy.exists():
             cPluggy = u'XP'[abs(pluggy.mtime - self.mtime) < 10]
         if obse and obse.exists():
@@ -1153,7 +1153,7 @@ class SaveInfo(FileInfo):
 
     def get_cosave(self):
         """:rtype: cosaves.ACoSaveFile"""
-        cosave_path = self._get_se_cosave_path()
+        cosave_path = self.get_se_cosave_path()
         if cosave_path is None: return None
         try:
             return self.cosave_type(cosave_path) # type: cosaves.ACoSaveFile
@@ -1163,7 +1163,7 @@ class SaveInfo(FileInfo):
                 deprint(u'Failed to open %s' % cosave_path, traceback=True)
             return None
 
-    def _get_se_cosave_path(self):
+    def get_se_cosave_path(self):
         if self.cosave_type is None: return None
         return self.getPath().root + u'.' + self.cosave_type.signature.lower()
 
@@ -3243,6 +3243,8 @@ def initDefaultTools():
     tooldirs['Tes5EditPath'] = dirs['app'].join(u'TES5Edit.exe')
     tooldirs['SSEEditPath'] = dirs['app'].join(u'SSEEdit.exe')
     tooldirs['Fo4EditPath'] = dirs['app'].join(u'FO4Edit.exe')
+    tooldirs['Fo3EditPath'] = dirs['app'].join(u'FO3Edit.exe')
+    tooldirs['FnvEditPath'] = dirs['app'].join(u'FNVEdit.exe')
     tooldirs['Tes4LodGenPath'] = dirs['app'].join(u'TES4LodGen.exe')
     tooldirs['Tes4GeckoPath'] = dirs['app'].join(u'Tes4Gecko.jar')
     tooldirs['Tes5GeckoPath'] = pathlist(u'Dark Creations',u'TESVGecko',u'TESVGecko.exe')

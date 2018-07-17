@@ -22,19 +22,20 @@
 #
 # =============================================================================
 
-"""This module contains all of the basic types used to read ESP/ESM mod files"""
-import zlib
+"""This module contains all of the basic types used to read ESP/ESM mod files.
+"""
 import StringIO
+import cPickle
+import copy
 import os
 import struct
-import copy
-import cPickle
+import zlib
 from operator import attrgetter
-import bass
+
 import bolt
 import exception
-from bolt import decode, encode, sio, GPath, struct_pack, struct_unpack
 from bass import null1
+from bolt import decode, encode, sio, GPath, struct_pack, struct_unpack
 
 # Util Functions --------------------------------------------------------------
 #--Type coercion
@@ -186,7 +187,8 @@ class RecordHeader(object):
             if RecordHeader.plugin_form_version:
                 extra1, extra2 = struct_unpack('=2h',
                                                struct_pack('=I', self.extra))
-                extra1 = RecordHeader.plugin_form_version
+                if extra1 == 0:
+                    extra1 = RecordHeader.plugin_form_version
                 self.extra = \
                     struct_unpack('=I', struct_pack('=2h', extra1, extra2))[0]
                 pack_args.append(self.extra)
@@ -340,14 +342,14 @@ class ModReader:
     def findSubRecord(self,subType,recType='----'):
         """Finds subrecord with specified type."""
         atEnd = self.atEnd
-        unpack = self.unpack
+        self_unpack = self.unpack
         seek = self.seek
         while not atEnd():
-            (type,size) = unpack('4sH',6,recType+'.SUB_HEAD')
-            if type == subType:
-                return self.read(size,recType+'.'+subType)
+            (sub_type_,sub_rec_size) = self_unpack('4sH',6,recType+'.SUB_HEAD')
+            if sub_type_ == subType:
+                return self.read(sub_rec_size,recType+'.'+subType)
             else:
-                seek(size,1,recType+'.'+type)
+                seek(sub_rec_size,1,recType+'.'+sub_type_)
         #--Didn't find it?
         else:
             return None
@@ -1225,11 +1227,11 @@ class MelSet:
         """This function returns all of the attributes used in record instances that use this instance."""
         return [s for element in self.elements for s in element.getSlotsUsed()]
 
-    def initRecord(self,record,header,ins,unpack):
-        """Initialize record."""
+    def initRecord(self, record, header, ins, do_unpack):
+        """Initialize record, setting its attributes based on its elements."""
         for element in self.elements:
             element.setDefault(record)
-        MreRecord.__init__(record,header,ins,unpack)
+        MreRecord.__init__(record, header, ins, do_unpack)
 
     def getDefault(self,attr):
         """Returns default instance of specified instance. Only useful for
@@ -1467,7 +1469,7 @@ class MreRecord(object):
     simpleTypes = None
     isKeyedByEid = False
 
-    def __init__(self,header,ins=None,unpack=False):
+    def __init__(self, header, ins=None, do_unpack=False):
         self.header = header
         self.recType = header.recType
         self.fid = header.fid
@@ -1479,7 +1481,7 @@ class MreRecord(object):
         self.subrecords = None
         self.data = ''
         self.inName = ins and ins.inName
-        if ins: self.load(ins,unpack)
+        if ins: self.load(ins, do_unpack)
 
     def __repr__(self):
         if hasattr(self,'eid') and self.eid is not None:
@@ -1504,7 +1506,7 @@ class MreRecord(object):
             fullClass = MreRecord.type_class[self.recType]
             myCopy = fullClass(self.getHeader())
             myCopy.data = self.data
-            myCopy.load(unpack=True)
+            myCopy.load(do_unpack=True)
         else:
             myCopy = copy.deepcopy(self)
         if mapper and not myCopy.longFids:
@@ -1531,11 +1533,11 @@ class MreRecord(object):
                                      % (size,len(decomp)))
         return decomp
 
-    def load(self,ins=None,unpack=False):
+    def load(self, ins=None, do_unpack=False):
         """Load data from ins stream or internal data buffer."""
         type = self.recType
         #--Read, but don't analyze.
-        if not unpack:
+        if not do_unpack:
             self.data = ins.read(self.size,type)
         #--Unbuffered analysis?
         elif ins and not self.flags1.compressed:
@@ -1553,7 +1555,7 @@ class MreRecord(object):
                     if ins and ins.hasStrings: reader.setStringTable(ins.strings)
                     self.loadData(reader,reader.size)
         #--Discard raw data?
-        if unpack == 2:
+        if do_unpack == 2:
             self.data = None
             self.changed = True
 
@@ -1682,9 +1684,9 @@ class MelRecord(MreRecord):
     melSet = None #--Subclasses must define as MelSet(*mels)
     __slots__ = MreRecord.__slots__
 
-    def __init__(self,header,ins=None,unpack=False):
+    def __init__(self, header, ins=None, do_unpack=False):
         """Initialize."""
-        self.__class__.melSet.initRecord(self,header,ins,unpack)
+        self.__class__.melSet.initRecord(self, header, ins, do_unpack)
 
     def getDefault(self,attr):
         """Returns default instance of specified instance. Only useful for
@@ -1758,10 +1760,8 @@ class MreGlob(MelRecord):
 
 #------------------------------------------------------------------------------
 class MreGmstBase(MelRecord):
-    """Game Setting record.  Base class, each game should derive from this class
-       and set class member 'Master' to the file name of the game's main master
-       file."""
-    Master = None
+    """Game Setting record.  Base class, each game should derive from this
+    class."""
     Ids = None
     classType = 'GMST'
     class MelGmstValue(MelBase):
@@ -1791,19 +1791,20 @@ class MreGmstBase(MelRecord):
         """Returns <Oblivion/Skyrim/etc>.esm fid in long format for specified
            eid."""
         cls = self.__class__
+        import bosh # Late import to avoid circular imports
         if not cls.Ids:
-            fname = cls.Master + u'_ids.pkl'
+            import bush
+            fname = bush.game.pklfile
             try:
-                import bosh # Late import to avoid circular imports
-                cls.Ids = cPickle.load(
-                    bass.dirs['db'].join(fname).open())[cls.classType]
+                with open(fname) as pkl_file:
+                    cls.Ids = cPickle.load(pkl_file)[cls.classType]
             except:
                 old = bolt.deprintOn
                 bolt.deprintOn = True
                 bolt.deprint(u'Error loading %s:' % fname, traceback=True)
                 bolt.deprintOn = old
                 raise
-        return GPath(cls.Master+u'.esm'),cls.Ids[self.eid]
+        return bosh.modInfos.masterName,cls.Ids[self.eid]
 
 #------------------------------------------------------------------------------
 class MreLeveledListBase(MelRecord):
@@ -1824,9 +1825,9 @@ class MreLeveledListBase(MelRecord):
     __slots__ = (MelRecord.__slots__ +
         ['mergeOverLast','mergeSources','items','delevs','relevs'])
 
-    def __init__(self,header,ins=None,unpack=False):
+    def __init__(self, header, ins=None, do_unpack=False):
         """Initialize"""
-        MelRecord.__init__(self,header,ins,unpack)
+        MelRecord.__init__(self, header, ins, do_unpack)
         self.mergeOverLast = False #--Merge overrides last mod merged
         self.mergeSources = None #--Set to list by other functions
         self.items  = None #--Set of items included in list

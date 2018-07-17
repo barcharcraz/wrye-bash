@@ -319,7 +319,7 @@ def CreateStandaloneExe(args, file_version):
         # Call the setup script
         os.chdir(mopy)
         lprint(' Calling py2exe...')
-        subprocess.call([setup, 'py2exe', '-q'], shell=True, stdout=pipe,
+        subprocess.call([sys.executable, setup, 'py2exe', '-q'], shell=True, stdout=pipe,
                         stderr=pipe)
         os.chdir(root)
 
@@ -591,10 +591,7 @@ def ShowTutorial():
         listExt.fill('And install by copying the provided unicode dll into '
                      'your NSIS/Plugins/x86-unicode directory.'),
         list.fill('''py2exe: Used to create the Standalone EXE.'''),
-        list.fill('Modified zipextimporter.py:  Copy the modified version from'
-                  " this directory into your Python's Lib\\site-packages "
-                  'directory.  This is needed for custom zipextimporter '
-                  'functionality that the Wrye Bash Standalone uses.'),
+        list.fill('''scandir python lib: speedup filesystem operations.'''),
         list.fill('GitPython: This is used to parse the repository information'
                   ' to ensure non-repo files are not included in the built'
                   ' packages.  Get version 0.2.0 or newer. In addition, this '
@@ -604,7 +601,11 @@ def ShowTutorial():
                   'line argument.'),
         '',
         '   https://pypi.python.org/pypi/GitPython/',
-        ''
+        '',
+        'Please visit',
+        'https://github.com/wrye-bash/wrye-bash/wiki/%5Bgithub%5D-Making-A-Release',
+        'for exact versions and links',
+        '',
         ]
     print(*lines, sep='\n')
 

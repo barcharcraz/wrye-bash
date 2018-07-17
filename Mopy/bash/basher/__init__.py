@@ -201,6 +201,7 @@ class SashPanel(NotebookPanel):
             settings[self.sashPosKey] = self.splitter.GetSashPosition()
 
 class SashUIListPanel(SashPanel):
+    """SashPanel featuring a UIList and a corresponding listData datasource."""
     listData = None
     _status_str = u'OVERRIDE:' + u' %d'
     _ui_list_type = None # type: type
@@ -238,11 +239,10 @@ class SashUIListPanel(SashPanel):
         if not self._firstShow and destroy: # if the panel was shown
             super(SashUIListPanel, self).ClosePanel(destroy)
             self.uiList.SaveScrollPosition(isVertical=self.isVertical)
-        # the only SashPanels that do not have this attribute are ModDetails
-        # and SaveDetails that use a MasterList whose data is initially {}
         self.listData.save()
 
 class BashTab(_DetailsViewMixin, SashUIListPanel):
+    """Wrye Bash Tab, composed of a UIList and a Details panel."""
     _details_panel_type = None # type: type
     defaultSashPos = 512
     minimumSize = 256
@@ -1191,8 +1191,8 @@ class _EditableMixinOnFileInfos(_EditableMixin):
 class _SashDetailsPanel(_EditableMixinOnFileInfos, SashPanel):
     """Mod and Saves details panel, feature a master's list.
 
-    I named the master list attribute 'uilist' to stand out from the usual
-    uiList of SashPanels.
+    I named the master list attribute 'uilist' to stand apart from the
+    uiList of SashUIListPanel.
     :type uilist: MasterList"""
     defaultSubSashPos = 0 # that was the default for mods (for saves 500)
 
@@ -3640,6 +3640,7 @@ class BashFrame(BaltFrame):
         self.inRefreshData = False #--Prevent recursion while refreshing.
         self.knownCorrupted = set()
         self.knownInvalidVerions = set()
+        self.known_sse_form43_mods = set()
         self.incompleteInstallError = False
 
     @staticmethod
@@ -3821,15 +3822,15 @@ class BashFrame(BaltFrame):
         if warn_mods and not invalidVersions <= self.knownInvalidVerions:
             m = [_(u'Unrecognized Versions'),
                  _(u'The following mods have unrecognized header versions: ')]
-            m.extend(sorted(invalidVersions))
+            m.extend(sorted(invalidVersions - self.knownInvalidVerions))
             message.append(m)
             self.knownInvalidVerions |= invalidVersions
-        if warn_mods and not bosh.modInfos.sse_form43 <= self.knownInvalidVerions:
+        if warn_mods and not bosh.modInfos.sse_form43 <= self.known_sse_form43_mods:
             m = [_(u'Older Plugin Record Version'),
                  _(u"The following mods don't use the current plugin Form Version: ")]
-            m.extend(sorted(bosh.modInfos.sse_form43))
+            m.extend(sorted(bosh.modInfos.sse_form43 - self.known_sse_form43_mods))
             message.append(m)
-            self.knownInvalidVerions |= bosh.modInfos.sse_form43
+            self.known_sse_form43_mods |= bosh.modInfos.sse_form43
         if warn_strings and bosh.modInfos.new_missing_strings:
             m = [_(u'Missing String Localization files:'),
                  _(u'This will cause CTDs if activated.')]

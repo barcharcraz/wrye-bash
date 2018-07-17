@@ -1397,6 +1397,59 @@ class ItemStats:
                               'critDamage':self.sint,
                               'criticalMultiplier':self.sfloat,
                               'criticalEffect':self.sint,}
+        elif bush.game.fsName in (u'FalloutNV', u'Fallout3'):
+            self.attr_type = {'eid':self.sstr,
+                              'weight':self.sfloat,
+                              'value':self.sint,
+                              'damage':self.sint,
+                              'speed':self.sfloat,
+                              'enchantPoints':self.snoneint,
+                              'health':self.sint,
+                              'strength':self.sint,
+                              'duration':self.sint,
+                              'quality':self.sfloat,
+                              'uses':self.sint,
+                              'reach':self.sfloat,
+                              'clipRounds':self.sint,
+                              'projPerShot':self.sint,
+                              'ar':self.sint,
+                              'dt':self.sfloat,
+                              'clipsize':self.sint,
+                              'animationMultiplier':self.sfloat,
+                              'ammoUse':self.sint,
+                              'minSpread':self.sfloat,
+                              'spread':self.sfloat,
+                              'sightFov':self.sfloat,
+                              'baseVatsToHitChance':self.sint,
+                              'projectileCount':self.sint,
+                              'minRange':self.sfloat,
+                              'maxRange':self.sfloat,
+                              'animationAttackMultiplier':self.sfloat,
+                              'fireRate':self.sfloat,
+                              'overrideActionPoint':self.sfloat,
+                              'rumbleLeftMotorStrength':self.sfloat,
+                              'rumbleRightMotorStrength':self.sfloat,
+                              'rumbleDuration':self.sfloat,
+                              'overrideDamageToWeaponMult':self.sfloat,
+                              'attackShotsPerSec':self.sfloat,
+                              'reloadTime':self.sfloat,
+                              'jamTime':self.sfloat,
+                              'aimArc':self.sfloat,
+                              'rambleWavelangth':self.sfloat,
+                              'limbDmgMult':self.sfloat,
+                              'sightUsage':self.sfloat,
+                              'semiAutomaticFireDelayMin':self.sfloat,
+                              'semiAutomaticFireDelayMax':self.sfloat,
+                              'strengthReq':self.sint,
+                              'regenRate':self.sfloat,
+                              'killImpulse':self.sfloat,
+                              'impulseDist':self.sfloat,
+                              'skillReq':self.sint,
+                              'criticalDamage':self.sint,
+                              'criticalMultiplier':self.sfloat,
+                              'vatsSkill':self.sfloat,
+                              'vatsDamMult':self.sfloat,
+                              'vatsAp':self.sfloat,}
         elif bush.game.fsName == u'Oblivion':
             self.attr_type = {'eid':self.sstr,
                               'weight':self.sfloat,
@@ -3908,7 +3961,7 @@ class ModFile(object):
         else:
             raise ArgumentError(u'Invalid top group type: '+topType)
 
-    def load(self,unpack=False,progress=None,loadStrings=True):
+    def load(self, do_unpack=False, progress=None, loadStrings=True):
         """Load file."""
         progress = progress or bolt.Progress()
         progress.setFull(1.0)
@@ -3919,7 +3972,7 @@ class ModFile(object):
             self.tes4 = bush.game_mod.records.MreHeader(header,ins,True)
             #--Strings
             self.strings.clear()
-            if unpack and self.tes4.flags1[7] and loadStrings:
+            if do_unpack and self.tes4.flags1[7] and loadStrings:
                 stringsProgress = SubProgress(progress,0,0.1) # Use 10% of progress bar for strings
                 lang = bosh.oblivionIni.get_ini_language()
                 stringsPaths = self.fileInfo.getStringsPaths(lang)
@@ -3948,7 +4001,7 @@ class ModFile(object):
                 try:
                     if topClass:
                         self.tops[label] = topClass(header, self.loadFactory)
-                        self.tops[label].load(ins, unpack and (topClass != MobBase))
+                        self.tops[label].load(ins, do_unpack and (topClass != MobBase))
                     else:
                         self.topsSkipped.add(label)
                         insSeek(size-header.__class__.rec_header_size,1,type + '.' + label)

@@ -580,6 +580,8 @@ class Save_Move(ChoiceLink):
     def __init__(self, copyMode=False):
         super(Save_Move, self).__init__()
         self.copyMode = copyMode
+        self._help_str = _(u'Copy save(s) to %s') if copyMode else _(
+            u'Move save(s) to %s')
 
     @property
     def _choices(self): return [x.s for x in bosh.saveInfos.getLocalSaveDirs()]
@@ -590,9 +592,14 @@ class Save_Move(ChoiceLink):
         _self = self
         class _Default(EnabledLink):
             _text = _(u'Default')
+            help = _self._help_str % bass.dirs['saveBase'].join(u'Saves')
             def _enable(self): return Save_Move.local != u'Saves\\'
             def Execute(self): _self.MoveFiles(_(u'Default'))
         class _SaveProfileLink(EnabledLink):
+            @property
+            def help(self):
+                return _self._help_str % bass.dirs['saveBase'].join(
+                    u'Saves', self._text)
             def _enable(self):
                 return Save_Move.local != (u'Saves\\' + self._text + u'\\')
             def Execute(self): _self.MoveFiles(self._text)
@@ -756,19 +763,15 @@ class Save_StatObse(AppendableLink, OneItemLink):
 
     def _enable(self):
         if not super(Save_StatObse, self)._enable(): return False
-        cosave = self._selected_info.getPath().root + u'.' + \
-                   bush.game.se.shortName
+        cosave = self._selected_info.get_se_cosave_path()
         return cosave.exists()
 
     def Execute(self):
-        saveFile = bosh._saves.SaveFile(self._selected_info)
-        with balt.Progress(u'.'+bush.game.se.shortName) as progress:
-            saveFile.load(SubProgress(progress,0,0.9))
+        with balt.BusyCursor():
             log = bolt.LogFile(StringIO.StringIO())
-            progress(0.9,_(u"Calculating statistics."))
             cosave = self._selected_info.get_cosave()
             if cosave is not None:
-                cosave.logStatObse(log, saveFile.masters)
+                cosave.logStatObse(log, self._selected_info.header.masters)
         text = log.out.getvalue()
         log.out.close()
         self._showLog(text, title=self._selected_item.s, fixedFont=False)

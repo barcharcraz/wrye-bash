@@ -61,6 +61,7 @@ class Fallout4GameInfo(GameInfo):
     )
 
     espm_extensions = {u'.esp', u'.esm', u'.esl'}
+    has_achlist = True
 
     class cs(GameInfo.cs):
         # TODO:  When the Fallout 4 Creation Kit is actually released,
@@ -79,9 +80,6 @@ class Fallout4GameInfo(GameInfo):
         url = u'http://f4se.silverlock.org/'
         urlTip = u'http://f4se.silverlock.org/'
 
-    class ge(GameInfo.ge):
-        exe = u'**DNE**'
-
     dontSkipDirs = {
         # This rule is to allow mods with string translation enabled.
         'interface\\translations':['.txt']
@@ -96,28 +94,23 @@ class Fallout4GameInfo(GameInfo):
     class ess(GameInfo.ess):
         ext = u'.fos'
 
-    dataDirs = {
+    dataDirs = GameInfo.dataDirs | {
         u'interface',
         u'lodsettings',
         u'materials',
-        u'meshes',
         u'misc',
-        u'music',
         u'programs',
         u'scripts',
         u'seq',
         u'shadersfx',
-        u'sound',
         u'strings',
-        u'textures',
-        u'video',
         u'vis',
     }
     dataDirsPlus = {
         u'f4se',
         u'ini',
-        u'tools', # bodyslide
         u'mcm',   # FO4 MCM
+        u'tools', # bodyslide
     }
 
     class esp(GameInfo.esp):

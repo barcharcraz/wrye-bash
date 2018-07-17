@@ -31,6 +31,7 @@ import collections
 import copy
 import csv
 import datetime
+import errno
 import gettext
 import locale
 import os
@@ -116,6 +117,7 @@ def _getbestencoding(bitstream):
     return encoding_,confidence
 
 def decode(byte_str, encoding=None, avoidEncodings=()):
+    """Decode a byte string to unicode, using heuristics on encoding."""
     if isinstance(byte_str, unicode) or byte_str is None: return byte_str
     # Try the user specified encoding first
     if encoding:
@@ -134,6 +136,7 @@ def decode(byte_str, encoding=None, avoidEncodings=()):
 
 def encode(text_str, encodings=encodingOrder, firstEncoding=None,
            returnEncoding=False):
+    """Encode unicode string to byte string, using heuristics on encoding."""
     if isinstance(text_str, str) or text_str is None:
         if returnEncoding: return text_str, None
         else: return text_str
@@ -910,7 +913,11 @@ class Path(object):
         else:
             return open(self._s,*args,**kwdargs)
     def makedirs(self):
-        if not self.exists(): os.makedirs(self._s)
+        try:
+            os.makedirs(self._s)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
     def remove(self):
         try:
             if self.exists(): os.remove(self._s)
@@ -1008,8 +1015,15 @@ class Path(object):
                 else:
                     # this will fail with Access Denied (!) if self._s is
                     # (unexpectedly) a directory
-                    os.remove(self._s)
+                    try:
+                        os.remove(self._s)
+                    except OSError as e:
+                        if e.errno != errno.EACCES:
+                            raise
+                        self.clearRO()
+                        os.remove(self._s)
             shutil.move(self.temp._s, self._s)
+
     def editable(self):
         """Safely check whether a file is editable."""
         delete = not os.path.exists(self._s)
@@ -1636,6 +1650,12 @@ def unpack_byte(ins): return struct_unpack('B', ins.read(1))[0]
 def unpack_int_signed(ins): return struct_unpack('i', ins.read(4))[0]
 def unpack_int64_signed(ins): return struct_unpack('q', ins.read(8))[0]
 def unpack_4s(ins): return struct_unpack('4s', ins.read(4))[0]
+def unpack_str16_delim(ins):
+    str_value = ins.read(struct_unpack('Hc', ins.read(3))[0])
+    ins.read(1) # discard delimiter
+    return str_value
+def unpack_int_delim(ins): return struct_unpack('Ic', ins.read(5))[0]
+def unpack_byte_delim(ins): return struct_unpack('Bc', ins.read(2))[0]
 
 def unpack_string(ins, string_len):
     return struct_unpack('%ds' % string_len, ins.read(string_len))[0]

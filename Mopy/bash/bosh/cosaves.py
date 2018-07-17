@@ -367,8 +367,10 @@ class ACoSaveFile(object):
         log.setHeader(_(u'Header'))
         log(u'=' * 80)
         log(_(u'  Format version:   %08X') % (self.cosave_header.formatVersion,))
-        log(_(u'  OBSE version:     %u.%u') % (self.cosave_header.obseVersion,self.cosave_header.obseMinorVersion,))
-        log(_(u'  Oblivion version: %08X') % (self.cosave_header.oblivionVersion,))
+        log(_(u'  %s version:      %u.%u') % (
+            self.signature, self.cosave_header.obseVersion,
+            self.cosave_header.obseMinorVersion,))
+        log(_(u'  Game version:     %08X') % (self.cosave_header.oblivionVersion,))
         #--Plugins
         for plugin_ch in self.plugin_chunks: # type: _PluginChunk
             plugin_sig = plugin_ch.plugin_signature
@@ -434,6 +436,12 @@ class F4seCosave(SkseCosave):
     signature = 'F4SE'
     _espm_chunk_type = {'SDOM', 'DOML'}
 
+class NvseCosave(ACoSaveFile):
+    signature = 'NVSE'
+
+class FoseCosave(ACoSaveFile):
+    signature = 'FOSE'
+
 # Factory
 def get_cosave_type(game_fsName):
     """:rtype: type"""
@@ -445,4 +453,8 @@ def get_cosave_type(game_fsName):
         return SkseSECosave
     elif game_fsName == u'Fallout4':
         return F4seCosave
+    elif game_fsName == u'Fallout3':
+        return FoseCosave
+    elif game_fsName == u'FalloutNV':
+        return NvseCosave
     return None

@@ -29,6 +29,7 @@ from operator import itemgetter
 from brec import ModReader
 from bolt import sio, struct_pack, struct_unpack
 import bosh # for modInfos
+import bush # for fallout3/nv fsName
 from exception import AbstractError, ArgumentError, ModError
 
 # Tes3 Group/Top Types --------------------------------------------------------
@@ -53,7 +54,7 @@ class MobBase(object):
     __slots__ = ['header','size','label','groupType','stamp','debug','data',
                  'changed','numRecords','loadFactory','inName']
 
-    def __init__(self,header,loadFactory,ins=None,unpack=False):
+    def __init__(self, header, loadFactory, ins=None, do_unpack=False):
         """Initialize."""
         self.header = header
         if header.recType == 'GRUP':
@@ -69,13 +70,13 @@ class MobBase(object):
         self.numRecords = -1
         self.loadFactory = loadFactory
         self.inName = ins and ins.inName
-        if ins: self.load(ins,unpack)
+        if ins: self.load(ins, do_unpack)
 
-    def load(self,ins=None,unpack=False):
+    def load(self, ins=None, do_unpack=False):
         """Load data from ins stream or internal data buffer."""
         if self.debug: print u'GRUP load:',self.label
         #--Read, but don't analyze.
-        if not unpack:
+        if not do_unpack:
             self.data = ins.read(self.size - self.header.__class__.rec_header_size, type(self))
         #--Analyze ins.
         elif ins is not None:
@@ -86,7 +87,7 @@ class MobBase(object):
             with self.getReader() as reader:
                 self.loadData(reader,reader.size)
         #--Discard raw data?
-        if unpack:
+        if do_unpack:
             self.data = None
             self.setChanged()
 
@@ -160,11 +161,11 @@ class MobObjects(MobBase):
     """Represents a top level group consisting of one type of record only. I.e.
     all top groups except CELL, WRLD and DIAL."""
 
-    def __init__(self,header,loadFactory,ins=None,unpack=False):
+    def __init__(self, header, loadFactory, ins=None, do_unpack=False):
         """Initialize."""
         self.records = []
         self.id_records = {}
-        MobBase.__init__(self,header,loadFactory,ins,unpack)
+        MobBase.__init__(self, header, loadFactory, ins, do_unpack)
 
     def loadData(self,ins,endPos):
         """Loads data from input stream. Called by load()."""
@@ -369,7 +370,7 @@ class MobCell(MobBase):
     __slots__ = MobBase.__slots__ + ['cell','persistent','distant','temp',
                                      'land','pgrd']
 
-    def __init__(self,header,loadFactory,cell,ins=None,unpack=False):
+    def __init__(self, header, loadFactory, cell, ins=None, do_unpack=False):
         """Initialize."""
         self.cell = cell
         self.persistent = []
@@ -377,7 +378,7 @@ class MobCell(MobBase):
         self.temp = []
         self.land = None
         self.pgrd = None
-        MobBase.__init__(self,header,loadFactory,ins,unpack)
+        MobBase.__init__(self, header, loadFactory, ins, do_unpack)
 
     def loadData(self,ins,endPos):
         """Loads data from input stream. Called by load()."""
@@ -593,12 +594,12 @@ class MobCells(MobBase):
     cells, bsbs are tuples of two numbers, while for exterior cells, bsb labels
     are tuples of grid tuples."""
 
-    def __init__(self,header,loadFactory,ins=None,unpack=False):
+    def __init__(self, header, loadFactory, ins=None, do_unpack=False):
         """Initialize."""
         self.cellBlocks = [] #--Each cellBlock is a cell and its related
         # records.
         self.id_cellBlock = {}
-        MobBase.__init__(self,header,loadFactory,ins,unpack)
+        MobBase.__init__(self, header, loadFactory, ins, do_unpack)
 
     def indexRecords(self):
         """Indexes records by fid."""
@@ -793,12 +794,12 @@ class MobICells(MobCells):
 
 #------------------------------------------------------------------------------
 class MobWorld(MobCells):
-    def __init__(self,header,loadFactory,world,ins=None,unpack=False):
+    def __init__(self, header, loadFactory, world, ins=None, do_unpack=False):
         """Initialize."""
         self.world = world
         self.worldCellBlock = None
         self.road = None
-        MobCells.__init__(self,header,loadFactory,ins,unpack)
+        MobCells.__init__(self, header, loadFactory, ins, do_unpack)
 
     def loadData(self,ins,endPos):
         """Loads data from input stream. Called by load()."""
@@ -817,6 +818,8 @@ class MobWorld(MobCells):
         insTell = ins.tell
         selfLoadFactory = self.loadFactory
         cellBlocksAppend = cellBlocks.append
+        isFallout = bush.game.fsName.lower() in (u'fallout3', u'falloutnv')
+        cells = {}
         while not insAtEnd(endPos,errLabel):
             curPos = insTell()
             if curPos >= endBlockPos:
@@ -844,6 +847,7 @@ class MobWorld(MobCells):
                                                hex(cell.fid),cell.eid))
                         self.worldCellBlock = cellBlock
                 cell = recClass(header,ins,True)
+                if isFallout: cells[cell.fid] = cell
                 if block:
                     if insTell() > endBlockPos or insTell() > endSubblockPos:
                         raise ModError(self.inName,
@@ -863,6 +867,7 @@ class MobWorld(MobCells):
                     # subblock = (subblock[1],subblock[0]) # unused var
                     endSubblockPos = insTell() + delta
                 elif groupType == 6: # Cell Children
+                    if isFallout: cell = cells.get(groupFid,None)
                     if cell:
                         if groupFid != cell.fid:
                             raise ModError(self.inName,
@@ -1000,12 +1005,12 @@ class MobWorlds(MobBase):
     """Tes4 top block for world records and related roads and cells. Consists
     of world blocks."""
 
-    def __init__(self,header,loadFactory,ins=None,unpack=False):
+    def __init__(self, header, loadFactory, ins=None, do_unpack=False):
         """Initialize."""
         self.worldBlocks = []
         self.id_worldBlocks = {}
         self.orphansSkipped = 0
-        MobBase.__init__(self,header,loadFactory,ins,unpack)
+        MobBase.__init__(self, header, loadFactory, ins, do_unpack)
 
     def loadData(self,ins,endPos):
         """Loads data from input stream. Called by load()."""
@@ -1019,18 +1024,22 @@ class MobWorlds(MobBase):
         insSeek = ins.seek
         selfLoadFactory = self.loadFactory
         worldBlocksAppend = worldBlocks.append
+        isFallout = bush.game.fsName.lower() in (u'fallout3', u'falloutnv')
+        worlds = {}
         while not insAtEnd(endPos,errLabel):
             #--Get record info and handle it
             header = insRecHeader()
             recType = header.recType
             if recType == expType:
                 world = recWrldClass(header,ins,True)
+                if isFallout: worlds[world.fid] = world
             elif recType == 'GRUP':
                 groupFid,groupType = header.label,header.groupType
                 if groupType != 1:
                     raise ModError(ins.inName,
                                    u'Unexpected subgroup %d in CELL group.'
                                    % groupType)
+                if isFallout: world = worlds.get(groupFid,None)
                 if not world:
                     #raise ModError(ins.inName,'Extra subgroup %d in WRLD
                     # group.' % groupType)
